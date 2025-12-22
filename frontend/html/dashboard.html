@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Sistem Asrama</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --success: #10b981;
+            --info: #3b82f6;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        .sidebar {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            min-height: 100vh;
+            position: fixed;
+            width: 250px;
+            transition: all 0.3s;
+        }
+
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 12px 20px;
+            margin: 5px 10px;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            border-left: 5px solid var(--primary);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card.rooms {
+            border-left-color: var(--primary);
+        }
+
+        .stat-card.residents {
+            border-left-color: var(--success);
+        }
+
+        .stat-card.payments {
+            border-left-color: var(--info);
+        }
+
+        .stat-card.repairs {
+            border-left-color: var(--warning);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .stat-icon.rooms {
+            background: linear-gradient(135deg, var(--primary), #8a6eff);
+        }
+
+        .stat-icon.residents {
+            background: linear-gradient(135deg, var(--success), #34d399);
+        }
+
+        .stat-icon.payments {
+            background: linear-gradient(135deg, var(--info), #60a5fa);
+        }
+
+        .stat-icon.repairs {
+            background: linear-gradient(135deg, var(--warning), #fbbf24);
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="sidebar">
+        <div class="p-4">
+            <div class="d-flex align-items-center mb-4">
+                <div class="bg-white rounded-circle p-2 me-3">
+                    <i class="fas fa-university text-primary fa-lg"></i>
+                </div>
+                <h4 class="mb-0">Sistem Asrama</h4>
+            </div>
+
+            <div class="mb-4 text-center">
+                <div class="rounded-circle bg-white d-inline-flex align-items-center justify-content-center mb-2"
+                    style="width: 80px; height: 80px;">
+                    <i class="fas fa-user fa-2x text-primary"></i>
+                </div>
+                <h6 id="userName" class="mb-1">Admin</h6>
+                <small id="userRole" class="text-white-50">Administrator</small>
+            </div>
+
+            <nav class="nav flex-column">
+                <a class="nav-link active" href="/dashboard">
+                    <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                </a>
+                <a class="nav-link" href="/rooms">
+                    <i class="fas fa-bed me-2"></i>Kamar
+                </a>
+                <a class="nav-link" href="/payments">
+                    <i class="fas fa-money-bill-wave me-2"></i>Pembayaran
+                </a>
+                <a class="nav-link" href="/repairs">
+                    <i class="fas fa-tools me-2"></i>Perbaikan
+                </a>
+                <div class="mt-4 pt-3 border-top border-white-10">
+                    <a class="nav-link text-danger" href="#" onclick="logout()">
+                        <i class="fas fa-sign-out-alt me-2"></i>Logout
+                    </a>
+                </div>
+            </nav>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0">Dashboard</h2>
+            <div class="d-flex gap-2">
+                <span id="currentDate" class="text-muted"></span>
+            </div>
+        </div>
+
+        <div class="row mb-4" id="statsCards">
+            <!-- Stats cards will be loaded here -->
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <div class="chart-container">
+                    <h5>Statistik Bulanan</h5>
+                    <canvas id="monthlyChart"></canvas>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="chart-container">
+                    <h5>Status Kamar</h5>
+                    <canvas id="roomStatusChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="chart-container">
+                    <h5>Pembayaran Terbaru</h5>
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="recentPaymentsTable">
+                            <thead>
+                                <tr>
+                                    <th>Bulan</th>
+                                    <th>Nama</th>
+                                    <th>Jumlah</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recentPaymentsBody">
+                                <!-- Recent payments will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="chart-container">
+                    <h5>Perbaikan Terbaru</h5>
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="recentRepairsTable">
+                            <thead>
+                                <tr>
+                                    <th>Judul</th>
+                                    <th>Prioritas</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recentRepairsBody">
+                                <!-- Recent repairs will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+
+    <script>
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+        if (!token) {
+            window.location.href = '/login';
+        }
+
+        document.getElementById('userName').textContent = user.name || 'Pengguna';
+        document.getElementById('userRole').textContent = user.role === 'admin' ? 'Administrator' : 'Mahasiswa';
+        document.getElementById('currentDate').textContent = new Date().toLocaleDateString('id-ID', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+
+        async function fetchWithAuth(url, options = {}) {
+            options.headers = {
+                ...options.headers,
+                'Authorization': `Bearer ${token}`
+            };
+
+            const response = await fetch(url, options);
+            if (response.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                window.location.href = '/login';
+            }
+            return response;
+        }
+
+        async function loadDashboardData() {
+            try {
+                // Load stats
+                const statsResponse = await fetchWithAuth('/api/dashboard/stats');
+                const stats = await statsResponse.json();
+
+                // Update stats cards
+                document.getElementById('statsCards').innerHTML = `
+                    <div class="col-md-3">
+                        <div class="stat-card rooms">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted mb-2">Total Kamar</h6>
+                                    <h3 class="mb-0">${stats.total_rooms}</h3>
+                                    <small class="text-success">${stats.occupied_rooms} terisi</small>
+                                </div>
+                                <div class="stat-icon rooms">
+                                    <i class="fas fa-bed"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card residents">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted mb-2">Total Penghuni</h6>
+                                    <h3 class="mb-0">${stats.total_residents}</h3>
+                                    <small class="text-muted">Aktif</small>
+                                </div>
+                                <div class="stat-icon residents">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card payments">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted mb-2">Pembayaran Tertunda</h6>
+                                    <h3 class="mb-0">${stats.pending_payments}</h3>
+                                    <small class="text-danger">Perlu tindakan</small>
+                                </div>
+                                <div class="stat-icon payments">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card repairs">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted mb-2">Perbaikan Pending</h6>
+                                    <h3 class="mb-0">${stats.pending_repairs}</h3>
+                                    <small class="text-warning">Menunggu</small>
+                                </div>
+                                <div class="stat-icon repairs">
+                                    <i class="fas fa-tools"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Create monthly revenue chart
+                const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
+                const monthlyLabels = stats.monthly_revenue.map(m => m.month);
+                const monthlyData = stats.monthly_revenue.map(m => m.revenue);
+
+                new Chart(monthlyCtx, {
+                    type: 'line',
+                    data: {
+                        labels: monthlyLabels,
+                        datasets: [{
+                            label: 'Pendapatan Bulanan',
+                            data: monthlyData,
+                            borderColor: 'rgb(102, 126, 234)',
+                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            }
+                        }
+                    }
+                });
+
+                // Create room status chart
+                const roomCtx = document.getElementById('roomStatusChart').getContext('2d');
+                const roomLabels = stats.room_status.map(r => r.status);
+                const roomData = stats.room_status.map(r => r.count);
+                const roomColors = ['#10b981', '#667eea', '#f59e0b'];
+
+                new Chart(roomCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: roomLabels,
+                        datasets: [{
+                            data: roomData,
+                            backgroundColor: roomColors,
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                            }
+                        }
+                    }
+                });
+
+                // Load recent payments
+                const paymentsResponse = await fetchWithAuth('/api/payments?limit=5');
+                const payments = await paymentsResponse.json();
+                const paymentsBody = document.getElementById('recentPaymentsBody');
+                paymentsBody.innerHTML = payments.slice(0, 5).map(payment => `
+                    <tr>
+                        <td>${new Date(payment.month).toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}</td>
+                        <td>${payment.resident?.user?.name || '-'}</td>
+                        <td>Rp ${payment.amount.toLocaleString('id-ID')}</td>
+                        <td>
+                            <span class="badge bg-${payment.status === 'paid' ? 'success' : payment.status === 'pending' ? 'warning' : 'danger'}">
+                                ${payment.status === 'paid' ? 'Lunas' : payment.status === 'pending' ? 'Pending' : 'Terlambat'}
+                            </span>
+                        </td>
+                    </tr>
+                `).join('');
+
+                // Load recent repairs
+                const repairsResponse = await fetchWithAuth('/api/repairs?limit=5');
+                const repairs = await repairsResponse.json();
+                const repairsBody = document.getElementById('recentRepairsBody');
+                repairsBody.innerHTML = repairs.slice(0, 5).map(repair => `
+                    <tr>
+                        <td>${repair.title}</td>
+                        <td>
+                            <span class="badge bg-${repair.priority === 'high' ? 'danger' : repair.priority === 'medium' ? 'warning' : 'info'}">
+                                ${repair.priority === 'high' ? 'Tinggi' : repair.priority === 'medium' ? 'Sedang' : 'Rendah'}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge bg-${repair.status === 'completed' ? 'success' : repair.status === 'in_progress' ? 'primary' : 'secondary'}">
+                                ${repair.status === 'completed' ? 'Selesai' : repair.status === 'in_progress' ? 'Dalam Proses' : 'Pending'}
+                            </span>
+                        </td>
+                    </tr>
+                `).join('');
+
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/login';
+        }
+
+        // Load data when page loads
+        document.addEventListener('DOMContentLoaded', loadDashboardData);
+    </script>
+</body>
+
+</html>
