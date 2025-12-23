@@ -36,11 +36,13 @@ func ConnectDatabase(config *config.Config) {
 
 	var err error
 	DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Info),
+		Logger: logger.Default.LogMode(logger.Error),
 	})
 
 	if err != nil {
-		log.Fatal("Failed to connect to database:", err)
+		log.Printf("Failed to connect to database: %v", err)
+		log.Printf("Connection String (hidden password): %s@tcp(%s:%d)/%s", config.DBUser, config.DBHost, config.DBPort, config.DBName)
+		log.Fatal("Could not connect to the database. Please check if MySQL is running and the credentials in .env are correct.")
 	}
 
 	sqlDB, err := DB.DB()

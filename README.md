@@ -47,16 +47,17 @@ dormitory-management-system/
 ├── backend/
 │   ├── config/          # Configuration
 │   ├── handlers/        # API Handlers
-│   ├── middleware/      # Auth & Rate Limiting
+│   ├── middleware/      # Middleware (Auth, CORS)
 │   ├── models/          # Database Models
 │   ├── routes/          # API Routes
-│   ├── utils/           # Utilities
-│   └── main.go
+│   ├── utils/           # Utilities (DB, JWT)
+│   ├── main.go          # Entry Point
+│   └── .env             # Environment Variables
 ├── frontend/
-│   ├── admin/           # Admin Interface
-│   ├── student/         # Student Interface
-│   ├── common/          # Shared Resources
-│   └── auth/            # Login & Register
+│   ├── admin/           # Admin Dashboard
+│   ├── student/         # Student Dashboard
+│   ├── auth/            # Login/Register
+│   └── common/          # Shared Resources
 ├── database/
 │   └── schema.sql       # Database Schema
 └── README.md

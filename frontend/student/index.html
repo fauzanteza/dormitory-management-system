@@ -215,12 +215,27 @@
                 .then(html => {
                     container.innerHTML = html;
 
-                    // Initialize page-specific scripts
-                    const initFunctionName = `init${page.split('-').map(word =>
-                        word.charAt(0).toUpperCase() + word.slice(1)).join('')}Page`;
-                    if (typeof window[initFunctionName] === 'function') {
-                        window[initFunctionName]();
+                    // Execute scripts found in the loaded content
+                    const scripts = container.getElementsByTagName("script");
+                    for (let i = 0; i < scripts.length; i++) {
+                        const script = document.createElement("script");
+                        if (scripts[i].src) {
+                            script.src = scripts[i].src;
+                        } else {
+                            script.text = scripts[i].text;
+                        }
+                        document.body.appendChild(script);
                     }
+
+                    // Initialize page-specific scripts
+                    // We need a small delay to ensure the script is parsed and executed
+                    setTimeout(() => {
+                        const initFunctionName = `init${page.split('-').map(word =>
+                            word.charAt(0).toUpperCase() + word.slice(1)).join('')}Page`;
+                        if (typeof window[initFunctionName] === 'function') {
+                            window[initFunctionName]();
+                        }
+                    }, 50);
                 })
                 .catch(error => {
                     container.innerHTML = `

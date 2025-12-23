@@ -114,6 +114,23 @@
                 document.getElementById('upcomingPayment').innerHTML =
                     '<p class="text-muted">Tidak ada tagihan mendatang</p>';
             }
+        } else {
+            // Show error state
+            const container = document.getElementById('contentContainer');
+            container.innerHTML = `
+                <div class="alert alert-danger">
+                    <h4><i class="fas fa-exclamation-circle me-2"></i>Gagal Memuat Data</h4>
+                    <p>Terjadi kesalahan saat menghubungi server. Kemungkinan penyebab:</p>
+                    <ul>
+                        <li>Server backend belum berjalan</li>
+                        <li>Database belum terhubung</li>
+                        <li>Koneksi internet terputus</li>
+                    </ul>
+                    <button class="btn btn-danger mt-2" onclick="loadPage('dashboard')">
+                        <i class="fas fa-sync-alt me-2"></i>Coba Lagi
+                    </button>
+                </div>
+            `;
         }
     }
 </script>

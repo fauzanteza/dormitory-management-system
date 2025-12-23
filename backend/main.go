@@ -31,6 +31,9 @@ func main() {
 	// Create Gin router
 	router := gin.Default()
 
+	// Fix "You trusted all proxies" warning
+	router.SetTrustedProxies(nil)
+
 	// CORS middleware
 	router.Use(func(c *gin.Context) {
 		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
