@@ -1,0 +1,139 @@
+<!-- Admin Bookings Management Page -->
+<div class="container-fluid">
+    <h4 class="mb-4"><i class="fas fa-calendar-check me-2"></i>Manajemen Pemesanan Kamar</h4>
+
+    <!-- Stats -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card bg-warning text-dark">
+                <div class="card-body">
+                    <h6 class="mb-1">Pending</h6>
+                    <h3 class="mb-0" id="pendingCount">0</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h6 class="mb-1">Approved</h6>
+                    <h3 class="mb-0" id="approvedCount">0</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-danger text-white">
+                <div class="card-body">
+                    <h6 class="mb-1">Rejected</h6>
+                    <h3 class="mb-0" id="rejectedCount">0</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bookings Table -->
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Mahasiswa</th>
+                            <th>Email</th>
+                            <th>Kamar</th>
+                            <th>Tanggal Booking</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bookingsTableBody">
+                        <tr>
+                            <td colspan="6" class="text-center py-4">
+                                <div class="spinner-border text-primary"></div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let bookingsData = [];
+
+    async function initBookingsPage() {
+        await loadBookings();
+    }
+
+    async function loadBookings() {
+        bookingsData = await window.adminDashboard.loadBookings();
+        displayBookings(bookingsData);
+        calculateBookingStats(bookingsData);
+    }
+
+    function displayBookings(bookings) {
+        const tbody = document.getElementById('bookingsTableBody');
+
+        if (bookings.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-muted">Tidak ada data</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = bookings.map(b => `
+        <tr>
+            <td>${b.user?.name || '-'}</td>
+            <td>${b.user?.email || '-'}</td>
+            <td>${b.room?.room_number || '-'}</td>
+            <td>${formatDate(b.created_at)}</td>
+            <td><span class="badge ${getStatusBadge(b.status)}">${b.status}</span></td>
+            <td>
+                ${b.status === 'pending' ? `
+                    <button class="btn btn-sm btn-success" onclick="approveBooking(${b.id})">
+                        <i class="fas fa-check"></i> Approve
+                    </button>
+                    <button class="btn btn-sm btn-danger" onclick="rejectBooking(${b.id})">
+                        <i class="fas fa-times"></i> Reject
+                    </button>
+                ` : '-'}
+            </td>
+        </tr>
+    `).join('');
+    }
+
+    function calculateBookingStats(bookings) {
+        const stats = bookings.reduce((acc, b) => {
+            if (b.status === 'pending') acc.pending++;
+            else if (b.status === 'approved') acc.approved++;
+            else if (b.status === 'rejected') acc.rejected++;
+            return acc;
+        }, { pending: 0, approved: 0, rejected: 0 });
+
+        document.getElementById('pendingCount').textContent = stats.pending;
+        document.getElementById('approvedCount').textContent = stats.approved;
+        document.getElementById('rejectedCount').textContent = stats.rejected;
+    }
+
+    async function approveBooking(id) {
+        if (!confirm('Approve pemesanan ini?')) return;
+
+        try {
+            await window.adminDashboard.updateBookingStatus(id, 'approved');
+            alert('Pemesanan berhasil di-approve!');
+            await loadBookings();
+        } catch (error) {
+            alert('Error: ' + error.message);
+        }
+    }
+
+    async function rejectBooking(id) {
+        if (!confirm('Reject pemesanan ini?')) return;
+
+        try {
+            await window.adminDashboard.updateBookingStatus(id, 'rejected');
+            alert('Pemesanan berhasil di-reject!');
+            await loadBookings();
+        } catch (error) {
+            alert('Error: ' + error.message);
+        }
+    }
+</script>

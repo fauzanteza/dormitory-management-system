@@ -1,0 +1,164 @@
+/* Student-Specific Styles */
+body.student {
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f0fdf4;
+}
+
+.student .navbar {
+    background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%) !important;
+    box-shadow: 0 2px 10px rgba(16, 185, 129, 0.3);
+}
+
+.student .sidebar {
+    background-color: #ffffff;
+    min-height: calc(100vh - 56px);
+    padding-top: 56px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    overflow-y: auto;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+    border-right: 1px solid #e5e7eb;
+}
+
+.student .sidebar .nav-link {
+    color: #6b7280;
+    padding: 0.75rem 1.5rem;
+    margin: 0.25rem 0.5rem;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.student .sidebar .nav-link:hover {
+    color: #10b981;
+    background-color: #f0fdf4;
+    transform: translateX(5px);
+}
+
+.student .sidebar .nav-link.active {
+    color: #fff;
+    background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+}
+
+.student .sidebar .nav-link i {
+    width: 20px;
+    text-align: center;
+}
+
+.student main {
+    margin-left: 0;
+    margin-top: 56px;
+}
+
+@media (min-width: 768px) {
+    .student main {
+        margin-left: 16.666667%;
+        /* col-md-3 */
+    }
+}
+
+@media (min-width: 992px) {
+    .student main {
+        margin-left: 16.666667%;
+        /* col-lg-2 */
+    }
+}
+
+.student .card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background: white;
+}
+
+.student .card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+.student .card-header {
+    background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);
+    color: white;
+    border-radius: 15px 15px 0 0 !important;
+    font-weight: 600;
+}
+
+.student .btn-primary {
+    background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);
+    border: none;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+    transition: all 0.3s ease;
+}
+
+.student .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+}
+
+.student .student-avatar {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    margin: 0 auto;
+}
+
+.student .notification-badge {
+    position: relative;
+    top: -5px;
+    right: -5px;
+}
+
+.student .quick-stat {
+    padding: 1rem;
+    background: linear-gradient(135deg, #f0fdf4 0%, #dbeafe 100%);
+    border-radius: 10px;
+    border-left: 4px solid #10b981;
+}
+
+.student .alert-success {
+    background-color: #f0fdf4;
+    border-color: #10b981;
+    color: #065f46;
+}
+
+.student .table {
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.student .table thead {
+    background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);
+    color: white;
+}
+
+.student .table tbody tr:hover {
+    background-color: #f0fdf4;
+}
+
+.student .badge {
+    padding: 0.4rem 0.8rem;
+    border-radius: 15px;
+    font-weight: 500;
+}
+
+.student .modal-header {
+    background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);
+    color: white;
+}
+
+.student .sidebar-heading {
+    color: #9ca3af;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+}

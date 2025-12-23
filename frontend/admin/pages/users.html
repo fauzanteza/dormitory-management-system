@@ -1,0 +1,254 @@
+<!-- Admin Users Management Page -->
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="mb-1">Manajemen User</h4>
+            <p class="text-muted small mb-0">Kelola akun pengguna sistem</p>
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h6 class="mb-1">Total Admin</h6>
+                    <h3 class="mb-0" id="totalAdmin">0</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h6 class="mb-1">Total Mahasiswa</h6>
+                    <h3 class="mb-0" id="totalStudent">0</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h6 class="mb-1">Total User</h6>
+                    <h3 class="mb-0" id="totalUsers">0</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <select class="form-select" id="filterRole" onchange="loadUsers()">
+                        <option value="">Semua Role</option>
+                        <option value="admin">Admin</option>
+                        <option value="student">Student</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <input type="text" class="form-control" id="searchUser" placeholder="Cari nama atau email..."
+                        onkeyup="loadUsers()">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Nama</th>
+                            <th>Email</th>
+                            <th>Telepon</th>
+                            <th>Role</th>
+                            <th>Bergabung</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody">
+                        <tr>
+                            <td colspan="6" class="text-center py-4">
+                                <div class="spinner-border text-primary"></div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- User Detail Modal -->
+<div class="modal fade" id="userDetailModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Detail User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center mb-4">
+                    <div class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center"
+                        style="width: 80px; height: 80px;">
+                        <i class="fas fa-user fa-2x"></i>
+                    </div>
+                </div>
+                <div class="list-group list-group-flush">
+                    <div class="list-group-item">
+                        <strong>Nama:</strong> <span id="detailName">-</span>
+                    </div>
+                    <div class="list-group-item">
+                        <strong>Email:</strong> <span id="detailEmail">-</span>
+                    </div>
+                    <div class="list-group-item">
+                        <strong>Telepon:</strong> <span id="detailPhone">-</span>
+                    </div>
+                    <div class="list-group-item">
+                        <strong>Role:</strong> <span id="detailRole" class="badge bg-primary">-</span>
+                    </div>
+                    <div class="list-group-item">
+                        <strong>Bergabung:</strong> <span id="detailCreated">-</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let usersData = [];
+
+    async function initUsersPage() {
+        await loadUsers();
+    }
+
+    async function loadUsers() {
+        const role = document.getElementById('filterRole').value;
+        const search = document.getElementById('searchUser').value;
+
+        usersData = await window.adminDashboard.loadUsers();
+
+        // Filter by role
+        let filtered = usersData;
+        if (role) {
+            filtered = filtered.filter(u => u.role === role);
+        }
+
+        // Filter by search
+        if (search) {
+            const searchLower = search.toLowerCase();
+            filtered = filtered.filter(u =>
+                u.name.toLowerCase().includes(searchLower) ||
+                u.email.toLowerCase().includes(searchLower)
+            );
+        }
+
+        displayUsers(filtered);
+        calculateUserStats(usersData);
+    }
+
+    function displayUsers(users) {
+        const tbody = document.getElementById('usersTableBody');
+
+        if (users.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-muted">Tidak ada data</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = users.map(u => `
+        <tr>
+            <td><strong>${u.name}</strong></td>
+            <td>${u.email}</td>
+            <td>${u.phone || '-'}</td>
+            <td><span class="badge ${u.role === 'admin' ? 'bg-primary' : 'bg-success'}">${u.role}</span></td>
+            <td>${formatDate(u.created_at)}</td>
+            <td>
+                <button class="btn btn-sm btn-info" onclick="viewUser(${u.id})" title="Detail">
+                    <i class="fas fa-eye"></i>
+                </button>
+                <button class="btn btn-sm btn-warning" onclick="resetPassword(${u.id})" title="Reset Password">
+                    <i class="fas fa-key"></i>
+                </button>
+                ${u.role !== 'admin' ? `
+                    <button class="btn btn-sm btn-danger" onclick="deleteUser(${u.id})" title="Hapus">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                ` : ''}
+            </td>
+        </tr>
+    `).join('');
+    }
+
+    function calculateUserStats(users) {
+        const stats = users.reduce((acc, u) => {
+            if (u.role === 'admin') acc.admin++;
+            else if (u.role === 'student') acc.student++;
+            return acc;
+        }, { admin: 0, student: 0 });
+
+        document.getElementById('totalAdmin').textContent = stats.admin;
+        document.getElementById('totalStudent').textContent = stats.student;
+        document.getElementById('totalUsers').textContent = users.length;
+    }
+
+    function viewUser(id) {
+        const user = usersData.find(u => u.id === id);
+        if (!user) return;
+
+        document.getElementById('detailName').textContent = user.name;
+        document.getElementById('detailEmail').textContent = user.email;
+        document.getElementById('detailPhone').textContent = user.phone || '-';
+        document.getElementById('detailRole').textContent = user.role;
+        document.getElementById('detailRole').className = `badge ${user.role === 'admin' ? 'bg-primary' : 'bg-success'}`;
+        document.getElementById('detailCreated').textContent = formatDate(user.created_at);
+
+        new bootstrap.Modal(document.getElementById('userDetailModal')).show();
+    }
+
+    async function resetPassword(id) {
+        const newPassword = prompt('Masukkan password baru (min. 6 karakter):');
+        if (!newPassword) return;
+
+        if (newPassword.length < 6) {
+            alert('Password minimal 6 karakter!');
+            return;
+        }
+
+        if (!confirm('Reset password untuk user ini?')) return;
+
+        try {
+            const response = await window.auth.fetchWithAuth(`/api/admin/users/${id}/reset-password`, {
+                method: 'POST',
+                body: JSON.stringify({ new_password: newPassword })
+            });
+
+            if (!response.ok) throw new Error('Failed to reset password');
+            alert('Password berhasil direset!');
+        } catch (error) {
+            alert('Error: ' + error.message);
+        }
+    }
+
+    async function deleteUser(id) {
+        if (!confirm('Apakah Anda yakin ingin menghapus user ini? Data terkait juga akan dihapus!')) return;
+
+        try {
+            const response = await window.auth.fetchWithAuth(`/api/admin/users/${id}`, {
+                method: 'DELETE'
+            });
+
+            if (!response.ok) throw new Error('Failed to delete user');
+            alert('User berhasil dihapus!');
+            await loadUsers();
+        } catch (error) {
+            alert('Error: ' + error.message);
+        }
+    }
+</script>

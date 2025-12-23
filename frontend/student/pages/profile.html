@@ -1,0 +1,157 @@
+<!-- Student Profile Page -->
+<div class="container-fluid">
+    <h4 class="mb-4"><i class="fas fa-user-circle me-2"></i>Profil & Pengaturan</h4>
+
+    <div class="row g-4">
+        <!-- Profile Card -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <div class="student-avatar mb-3"
+                        style="width: 120px; height: 120px; margin: 0 auto; font-size: 3rem;">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <h5 id="profileName">Loading...</h5>
+                    <p class="text-muted mb-0" id="profileEmail">-</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Profile Form -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Edit Profil</h5>
+                </div>
+                <form id="profileForm" onsubmit="updateProfile(event)">
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Nama Lengkap *</label>
+                                <input type="text" class="form-control" id="name" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Email *</label>
+                                <input type="email" class="form-control" id="email" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Nomor Telepon</label>
+                                <input type="tel" class="form-control" id="phone">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save me-2"></i>Simpan Perubahan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Change Password -->
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Ubah Password</h5>
+                </div>
+                <form id="passwordForm" onsubmit="changePassword(event)">
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Password Lama *</label>
+                                <input type="password" class="form-control" id="oldPassword" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Password Baru *</label>
+                                <input type="password" class="form-control" id="newPassword" minlength="6" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Konfirmasi Password Baru *</label>
+                                <input type="password" class="form-control" id="confirmPassword" minlength="6" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <button type="submit" class="btn btn-warning">
+                            <i class="fas fa-key me-2"></i>Ubah Password
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    async function initProfilePage() {
+        await loadProfileData();
+    }
+
+    async function loadProfileData() {
+        try {
+            const response = await window.auth.fetchWithAuth('/api/student/profile');
+            if (!response || !response.ok) {
+                throw new Error('Failed to load profile');
+            }
+
+            const profile = await response.json();
+
+            // Update display
+            document.getElementById('profileName').textContent = profile.name;
+            document.getElementById('profileEmail').textContent = profile.email;
+
+            // Fill form
+            document.getElementById('name').value = profile.name;
+            document.getElementById('email').value = profile.email;
+            document.getElementById('phone').value = profile.phone || '';
+        } catch (error) {
+            console.error('Error loading profile:', error);
+            alert('Gagal memuat profil');
+        }
+    }
+
+    async function updateProfile(event) {
+        event.preventDefault();
+
+        const profileData = {
+            name: document.getElementById('name').value,
+            email: document.getElementById('email').value,
+            phone: document.getElementById('phone').value
+        };
+
+        try {
+            await window.auth.updateProfile(profileData);
+            alert('Profil berhasil diperbarui!');
+            await loadProfileData();
+
+            // Update sidebar
+            document.getElementById('studentName').textContent = profileData.name;
+            document.getElementById('sidebarStudentName').textContent = profileData.name;
+            document.getElementById('sidebarStudentEmail').textContent = profileData.email;
+        } catch (error) {
+            alert('Error: ' + error.message);
+        }
+    }
+
+    async function changePassword(event) {
+        event.preventDefault();
+
+        const oldPassword = document.getElementById('oldPassword').value;
+        const newPassword = document.getElementById('newPassword').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+
+        if (newPassword !== confirmPassword) {
+            alert('Password baru dan konfirmasi password tidak cocok!');
+            return;
+        }
+
+        try {
+            await window.auth.changePassword(oldPassword, newPassword);
+            alert('Password berhasil diubah!');
+            document.getElementById('passwordForm').reset();
+        } catch (error) {
+            alert('Error: ' + error.message);
+        }
+    }
+</script>

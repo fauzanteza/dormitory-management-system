@@ -4,6 +4,8 @@ import (
 	"dormitory-management/config"
 	"dormitory-management/handlers"
 	"dormitory-management/middleware"
+	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -18,93 +20,135 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, config *config.Config) {
 	dashboardHandler := handlers.NewDashboardHandler(db)
 	residentHandler := handlers.NewResidentHandler(db)
 	userHandler := handlers.NewUserHandler(db)
-
 	bookingHandler := handlers.NewBookingHandler(db)
 
-	// Auth routes (no authentication required)
+	// Apply rate limiting globally
+	router.Use(middleware.RateLimitMiddleware())
+
+	// Public routes (no authentication required)
 	router.POST("/api/auth/login", authHandler.Login)
 	router.POST("/api/auth/register", authHandler.Register)
 
-	// Protected routes
-	api := router.Group("/api")
-	api.Use(middleware.AuthMiddleware(config))
+	// Health check endpoint
+	router.GET("/health", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"status":    "healthy",
+			"timestamp": time.Now().Unix(),
+			"version":   "1.0.0",
+		})
+	})
 
-	// Profile
-	api.GET("/profile", authHandler.GetProfile)
-	api.PUT("/profile", authHandler.UpdateProfile)
-	api.POST("/profile/password", authHandler.ChangePassword)
-
-	// Dashboard
-	api.GET("/dashboard/stats", dashboardHandler.GetDashboardStats)
-
-	// Rooms
-	rooms := api.Group("/rooms")
+	// ================= ADMIN API ROUTES =================
+	adminAPI := router.Group("/api/admin")
+	adminAPI.Use(middleware.AuthMiddleware(config), middleware.AdminMiddleware())
 	{
-		rooms.GET("", roomHandler.GetRooms)
-		rooms.GET("/available", roomHandler.GetAvailableRooms)
-		rooms.GET("/:id", roomHandler.GetRoom)
-		rooms.POST("", middleware.AdminMiddleware(), roomHandler.CreateRoom)
-		rooms.PUT("/:id", middleware.AdminMiddleware(), roomHandler.UpdateRoom)
-		rooms.DELETE("/:id", middleware.AdminMiddleware(), roomHandler.DeleteRoom)
-		rooms.POST("/:id/assign", middleware.AdminMiddleware(), roomHandler.AssignResident)
+		// Dashboard
+		adminAPI.GET("/dashboard/stats", dashboardHandler.GetDashboardStats)
+
+		// Rooms Management
+		adminAPI.GET("/rooms", roomHandler.GetRooms)
+		adminAPI.GET("/rooms/available", roomHandler.GetAvailableRooms)
+		adminAPI.GET("/rooms/:id", roomHandler.GetRoom)
+		adminAPI.POST("/rooms", roomHandler.CreateRoom)
+		adminAPI.PUT("/rooms/:id", roomHandler.UpdateRoom)
+		adminAPI.DELETE("/rooms/:id", roomHandler.DeleteRoom)
+		adminAPI.POST("/rooms/:id/assign", roomHandler.AssignResident)
+
+		// Bookings Management
+		adminAPI.GET("/bookings", bookingHandler.GetBookings)
+		adminAPI.PUT("/bookings/:id/status", bookingHandler.UpdateBookingStatus)
+
+		// Residents Management
+		adminAPI.GET("/residents", residentHandler.GetResidents)
+		adminAPI.GET("/residents/:id", residentHandler.GetResident)
+		adminAPI.POST("/residents", residentHandler.CreateResident)
+		adminAPI.PUT("/residents/:id", residentHandler.UpdateResident)
+		adminAPI.DELETE("/residents/:id", residentHandler.DeleteResident)
+
+		// Payments Management
+		adminAPI.GET("/payments", paymentHandler.GetPayments)
+		adminAPI.POST("/payments", paymentHandler.CreatePayment)
+		adminAPI.PUT("/payments/:id/status", paymentHandler.UpdatePaymentStatus)
+		adminAPI.GET("/payments/report", paymentHandler.GetMonthlyReport)
+
+		// Repairs Management
+		adminAPI.GET("/repairs", repairHandler.GetRepairRequests)
+		adminAPI.PUT("/repairs/:id/status", repairHandler.UpdateRepairStatus)
+		adminAPI.GET("/repairs/stats", repairHandler.GetRepairStats)
+
+		// Users Management
+		adminAPI.GET("/users", userHandler.GetUsers)
+		adminAPI.POST("/users/:id/reset-password", userHandler.ResetPassword)
+		adminAPI.DELETE("/users/:id", userHandler.DeleteUser)
+
+		// Profile
+		adminAPI.GET("/profile", authHandler.GetProfile)
+		adminAPI.PUT("/profile", authHandler.UpdateProfile)
+		adminAPI.POST("/change-password", authHandler.ChangePassword)
 	}
 
-	// Bookings
-	bookings := api.Group("/bookings")
+	// ================= STUDENT API ROUTES =================
+	studentAPI := router.Group("/api/student")
+	studentAPI.Use(middleware.AuthMiddleware(config))
 	{
-		bookings.GET("", bookingHandler.GetBookings)
-		bookings.POST("", bookingHandler.CreateBooking)
-		bookings.PUT("/:id/status", middleware.AdminMiddleware(), bookingHandler.UpdateBookingStatus)
+		// Student Dashboard
+		studentAPI.GET("/dashboard/stats", dashboardHandler.GetStudentDashboardStats)
+
+		// Room - View available rooms and own room
+		studentAPI.GET("/rooms/available", roomHandler.GetAvailableRooms)
+		studentAPI.GET("/my-room", roomHandler.GetMyRoom)
+
+		// Bookings - Create and view own bookings
+		studentAPI.GET("/bookings", bookingHandler.GetBookings)
+		studentAPI.POST("/bookings", bookingHandler.CreateBooking)
+
+		// Payments - View own payments
+		studentAPI.GET("/my-payments", paymentHandler.GetMyPayments)
+
+		// Repairs - Create and view own repairs
+		studentAPI.GET("/my-repairs", repairHandler.GetRepairRequests)
+		studentAPI.POST("/repairs", repairHandler.CreateRepairRequest)
+
+		// Profile
+		studentAPI.GET("/profile", authHandler.GetProfile)
+		studentAPI.PUT("/profile", authHandler.UpdateProfile)
+		studentAPI.POST("/change-password", authHandler.ChangePassword)
 	}
 
-	// Payments
-	payments := api.Group("/payments")
+	// ================= COMMON ROUTES =================
+	commonAPI := router.Group("/api")
+	commonAPI.Use(middleware.AuthMiddleware(config))
 	{
-		payments.GET("", paymentHandler.GetPayments)
-		payments.POST("", middleware.AdminMiddleware(), paymentHandler.CreatePayment)
-		payments.PUT("/:id/status", middleware.AdminMiddleware(), paymentHandler.UpdatePaymentStatus)
-		payments.GET("/report", paymentHandler.GetMonthlyReport)
+		// Logout
+		commonAPI.POST("/auth/logout", func(c *gin.Context) {
+			c.JSON(http.StatusOK, gin.H{"message": "Logged out successfully"})
+		})
 	}
 
-	// Repair requests
-	repairs := api.Group("/repairs")
-	{
-		repairs.GET("", repairHandler.GetRepairRequests)
-		repairs.POST("", repairHandler.CreateRepairRequest)
-		repairs.PUT("/:id/status", middleware.AdminMiddleware(), repairHandler.UpdateRepairStatus)
-		repairs.GET("/stats", repairHandler.GetRepairStats)
-	}
+	// ================= STATIC FILES SERVING =================
+	// Serve admin frontend
+	router.Static("/admin", "../frontend/admin")
 
-	// Residents
-	residents := api.Group("/residents")
-	residents.Use(middleware.AdminMiddleware())
-	{
-		residents.GET("", residentHandler.GetResidents)
-		residents.GET("/:id", residentHandler.GetResident)
-		residents.POST("", residentHandler.CreateResident)
-		residents.PUT("/:id", residentHandler.UpdateResident)
-		residents.DELETE("/:id", residentHandler.DeleteResident)
-	}
+	// Serve student frontend
+	router.Static("/student", "../frontend/student")
 
-	// Users
-	users := api.Group("/users")
-	users.Use(middleware.AdminMiddleware())
-	{
-		users.GET("", userHandler.GetUsers)
-		users.POST("/:id/reset-password", userHandler.ResetPassword)
-		users.DELETE("/:id", userHandler.DeleteUser)
-	}
+	// Serve auth pages
+	router.Static("/auth", "../frontend/auth")
 
-	// Serve static files
-	router.Static("/frontend", "../frontend")
-	router.StaticFile("/", "../frontend/html/index.html")
-	router.StaticFile("/login", "../frontend/html/login.html")
-	router.StaticFile("/dashboard", "../frontend/html/dashboard.html")
-	router.StaticFile("/rooms", "../frontend/html/rooms.html")
-	router.StaticFile("/payments", "../frontend/html/payments.html")
-	router.StaticFile("/repairs", "../frontend/html/repairs.html")
-	router.StaticFile("/residents", "../frontend/html/residents.html")
-	router.StaticFile("/users", "../frontend/html/users.html")
-	router.StaticFile("/profile", "../frontend/html/profile.html")
-	router.StaticFile("/bookings", "../frontend/html/bookings.html")
+	// Serve common resources
+	router.Static("/common", "../frontend/common")
+
+	// Root redirect based on role
+	router.GET("/", func(c *gin.Context) {
+		c.Redirect(http.StatusFound, "/auth/login.html")
+	})
+
+	// Login and register shortcuts
+	router.GET("/login", func(c *gin.Context) {
+		c.Redirect(http.StatusFound, "/auth/login.html")
+	})
+
+	router.GET("/register", func(c *gin.Context) {
+		c.Redirect(http.StatusFound, "/auth/register.html")
+	})
 }

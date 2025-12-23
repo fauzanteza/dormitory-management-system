@@ -1,0 +1,161 @@
+<!-- Student Payments Page -->
+<div class="container-fluid">
+    <h4 class="mb-4"><i class="fas fa-money-bill-wave me-2"></i>Pembayaran Saya</h4>
+
+    <!-- Payment Summary -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h6 class="mb-1">Total Terbayar</h6>
+                    <h3 class="mb-0" id="totalPaid">Rp 0</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-warning text-dark">
+                <div class="card-body">
+                    <h6 class="mb-1">Total Pending</h6>
+                    <h3 class="mb-0" id="totalPending">Rp 0</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-danger text-white">
+                <div class="card-body">
+                    <h6 class="mb-1">Total Overdue</h6>
+                    <h3 class="mb-0" id="totalOverdue">Rp 0</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <select class="form-select" id="filterStatus" onchange="loadMyPayments()">
+                        <option value="">Semua Status</option>
+                        <option value="paid">Lunas</option>
+                        <option value="pending">Pending</option>
+                        <option value="overdue">Telat</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payments List -->
+    <div class="row" id="paymentsContainer">
+        <div class="col-12 text-center py-5">
+            <div class="spinner-border text-success"></div>
+            <p class="mt-2">Memuat data pembayaran...</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    let myPaymentsData = [];
+
+    async function initPaymentsPage() {
+        await loadMyPayments();
+    }
+
+    async function loadMyPayments() {
+        const status = document.getElementById('filterStatus').value;
+        const params = status ? { status } : {};
+
+        myPaymentsData = await window.studentDashboard.loadMyPayments(params);
+        displayMyPayments(myPaymentsData);
+        calculatePaymentStats(myPaymentsData);
+    }
+
+    function displayMyPayments(payments) {
+        const container = document.getElementById('paymentsContainer');
+
+        if (payments.length === 0) {
+            container.innerHTML = `
+            <div class="col-12 text-center py-5">
+                <i class="fas fa-inbox fa-4x text-muted mb-3"></i>
+                <h5 class="text-muted">Tidak ada data pembayaran</h5>
+            </div>
+        `;
+            return;
+        }
+
+        container.innerHTML = payments.map(payment => `
+        <div class="col-md-6 col-lg-4 mb-3">
+            <div class="card h-100 ${payment.status === 'pending' ? 'border-warning' : payment.status === 'overdue' ? 'border-danger' : 'border-success'}">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h6 class="mb-1">Pembayaran ${formatDate(payment.month)}</h6>
+                            <small class="text-muted">Kamar ${payment.room?.room_number || '-'}</small>
+                        </div>
+                        <span class="badge ${getStatusBadge(payment.status)}">${payment.status}</span>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h3 class="mb-0 ${payment.status === 'paid' ? 'text-success' : payment.status === 'overdue' ? 'text-danger' : 'text-warning'}">
+                            ${formatCurrency(payment.amount)}
+                        </h3>
+                    </div>
+                    
+                    ${payment.payment_date ? `
+                        <div class="mb-2">
+                            <small class="text-muted"><i class="fas fa-calendar me-1"></i>Dibayar: ${formatDate(payment.payment_date)}</small>
+                        </div>
+                    ` : ''}
+                    
+                    ${payment.payment_method ? `
+                        <div class="mb-2">
+                            <small class="text-muted"><i class="fas fa-credit-card me-1"></i>${payment.payment_method}</small>
+                        </div>
+                    ` : ''}
+                    
+                    ${payment.notes ? `
+                        <div class="alert alert-info py-1 px-2 small mb-2">
+                            <i class="fas fa-info-circle me-1"></i>${payment.notes}
+                        </div>
+                    ` : ''}
+                    
+                    ${payment.status === 'pending' || payment.status === 'overdue' ? `
+                        <button class="btn btn-success btn-sm w-100 mt-2" onclick="payNow(${payment.id})">
+                            <i class="fas fa-money-bill-wave me-1"></i>Bayar Sekarang
+                        </button>
+                    ` : ''}
+                    
+                    ${payment.status === 'paid' && payment.receipt_path ? `
+                        <button class="btn btn-outline-info btn-sm w-100 mt-2" onclick="viewReceipt('${payment.receipt_path}')">
+                            <i class="fas fa-file-invoice me-1"></i>Lihat Bukti Bayar
+                        </button>
+                    ` : ''}
+                </div>
+            </div>
+        </div>
+    `).join('');
+    }
+
+    function calculatePaymentStats(payments) {
+        const stats = payments.reduce((acc, p) => {
+            if (p.status === 'paid') acc.paid += p.amount;
+            else if (p.status === 'pending') acc.pending += p.amount;
+            else if (p.status === 'overdue') acc.overdue += p.amount;
+            return acc;
+        }, { paid: 0, pending: 0, overdue: 0 });
+
+        document.getElementById('totalPaid').textContent = formatCurrency(stats.paid);
+        document.getElementById('totalPending').textContent = formatCurrency(stats.pending);
+        document.getElementById('totalOverdue').textContent = formatCurrency(stats.overdue);
+    }
+
+    function payNow(paymentId) {
+        alert('Fitur pembayaran online akan tersedia. Untuk saat ini, silakan lakukan pembayaran manual dan konfirmasi ke admin.');
+    }
+
+    function viewReceipt(receiptPath) {
+        // In production, this would open the receipt file
+        alert('Bukti pembayaran: ' + receiptPath);
+    }
+</script>

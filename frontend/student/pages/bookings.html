@@ -1,0 +1,149 @@
+<!-- Student Bookings Page -->
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="mb-0"><i class="fas fa-calendar-check me-2"></i>Pemesanan Kamar</h4>
+        <button class="btn btn-success" onclick="showAvailableRooms()">
+            <i class="fas fa-plus me-2"></i>Pesan Kamar
+        </button>
+    </div>
+
+    <!-- My Bookings -->
+    <div class="row" id="bookingsContainer">
+        <div class="col-12 text-center py-5">
+            <div class="spinner-border text-success"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Available Rooms Modal -->
+<div class="modal fade" id="availableRoomsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">Kamar Tersedia</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3" id="availableRoomsList">
+                    <div class="col-12 text-center py-4">
+                        <div class="spinner-border text-success"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let myBookings = [];
+    let availableRooms = [];
+
+    async function initBookingsPage() {
+        await loadMyBookings();
+    }
+
+    async function loadMyBookings() {
+        myBookings = await window.studentDashboard.loadMyBookings();
+        displayMyBookings(myBookings);
+    }
+
+    function displayMyBookings(bookings) {
+        const container = document.getElementById('bookingsContainer');
+
+        if (bookings.length === 0) {
+            container.innerHTML = `
+            <div class="col-12 text-center py-5">
+                <i class="fas fa-calendar-times fa-4x text-muted mb-3"></i>
+                <h5 class="text-muted">Belum ada pemesanan</h5>
+                <button class="btn btn-success mt-3" onclick="showAvailableRooms()">
+                    <i class="fas fa-plus me-2"></i>Pesan Kamar Sekarang
+                </button>
+            </div>
+        `;
+            return;
+        }
+
+        container.innerHTML = bookings.map(b => `
+        <div class="col-md-6 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h5 class="mb-1">Kamar ${b.room?.room_number || '-'}</h5>
+                            <small class="text-muted">${b.room?.building || '-'} - Lantai ${b.room?.floor || '-'}</small>
+                        </div>
+                        <span class="badge ${getStatusBadge(b.status)}">${b.status}</span>
+                    </div>
+                    
+                    <div class="mb-2">
+                        <small><i class="fas fa-calendar me-1"></i>Dipesan: ${formatDate(b.created_at)}</small>
+                    </div>
+                    
+                    <div class="mb-2">
+                        <small><i class="fas fa-money-bill-wave me-1"></i>${formatCurrency(b.room?.monthly_rate || 0)}/bulan</small>
+                    </div>
+                    
+                    ${b.status === 'approved' ? `
+                        <div class="alert alert-success py-2 mb-0">
+                            <small><i class="fas fa-check-circle me-1"></i>Pemesanan disetujui! Silakan lakukan pembayaran.</small>
+                        </div>
+                    ` : b.status === 'rejected' ? `
+                        <div class="alert alert-danger py-2 mb-0">
+                            <small><i class="fas fa-times-circle me-1"></i>Pemesanan ditolak.</small>
+                        </div>
+                    ` : `
+                        <div class="alert alert-warning py-2 mb-0">
+                            <small><i class="fas fa-clock me-1"></i>Menunggu persetujuan admin...</small>
+                        </div>
+                    `}
+                </div>
+            </div>
+        </div>
+    `).join('');
+    }
+
+    async function showAvailableRooms() {
+        availableRooms = await window.studentDashboard.loadAvailableRooms();
+
+        const container = document.getElementById('availableRoomsList');
+
+        if (availableRooms.length === 0) {
+            container.innerHTML = '<div class="col-12 text-center py-4 text-muted">Tidak ada kamar tersedia</div>';
+        } else {
+            container.innerHTML = availableRooms.map(room => `
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="mb-2">Kamar ${room.room_number}</h5>
+                        <p class="text-muted small mb-2">${room.building} - Lantai ${room.floor}</p>
+                        <div class="mb-2">
+                            <small><i class="fas fa-users me-1"></i>${room.current_occupancy || 0}/${room.capacity} terisi</small>
+                        </div>
+                        <div class="mb-3">
+                            <strong class="text-success">${formatCurrency(room.monthly_rate)}</strong>/bulan
+                        </div>
+                        <button class="btn btn-success btn-sm w-100" onclick="bookRoom(${room.id})">
+                            <i class="fas fa-check me-1"></i>Pesan Kamar Ini
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+        }
+
+        new bootstrap.Modal(document.getElementById('availableRoomsModal')).show();
+    }
+
+    async function bookRoom(roomId) {
+        if (!confirm('Anda yakin ingin memesan kamar ini?')) return;
+
+        try {
+            await window.studentDashboard.createBooking({ room_id: roomId });
+            alert('Pemesanan berhasil! Menunggu persetujuan admin.');
+            bootstrap.Modal.getInstance(document.getElementById('availableRoomsModal')).hide();
+            await loadMyBookings();
+        } catch (error) {
+            alert('Error: ' + error.message);
+        }
+    }
+</script>

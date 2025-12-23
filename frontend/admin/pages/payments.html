@@ -1,0 +1,254 @@
+<!-- Admin Payments Management Page -->
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="mb-1">Manajemen Pembayaran</h4>
+            <p class="text-muted small mb-0">Kelola pembayaran asrama</p>
+        </div>
+        <button class="btn btn-primary" onclick="showAddPaymentModal()">
+            <i class="fas fa-plus me-2"></i>Tambah Pembayaran
+        </button>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h6 class="mb-1">Total Terbayar</h6>
+                    <h3 class="mb-0" id="totalPaid">Rp 0</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-dark">
+                <div class="card-body">
+                    <h6 class="mb-1">Total Pending</h6>
+                    <h3 class="mb-0" id="totalPending">Rp 0</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-danger text-white">
+                <div class="card-body">
+                    <h6 class="mb-1">Total Overdue</h6>
+                    <h3 class="mb-0" id="totalOverdue">Rp 0</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h6 class="mb-1">Total Bulan Ini</h6>
+                    <h3 class="mb-0" id="totalThisMonth">Rp 0</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <select class="form-select" id="filterStatus" onchange="loadPayments()">
+                        <option value="">Semua Status</option>
+                        <option value="paid">Paid</option>
+                        <option value="pending">Pending</option>
+                        <option value="overdue">Overdue</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <input type="month" class="form-control" id="filterMonth" onchange="loadPayments()">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payments Table -->
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Penghuni</th>
+                            <th>Kamar</th>
+                            <th>Bulan</th>
+                            <th>Jumlah</th>
+                            <th>Status</th>
+                            <th>Tgl Bayar</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="paymentsTableBody">
+                        <tr>
+                            <td colspan="7" class="text-center py-4">
+                                <div class="spinner-border text-primary"></div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Payment Modal -->
+<div class="modal fade" id="paymentModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Tambah Pembayaran</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="paymentForm" onsubmit="savePayment(event)">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Penghuni *</label>
+                        <select class="form-select" id="residentId" required>
+                            <option value="">Pilih Penghuni</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Bulan *</label>
+                        <input type="month" class="form-control" id="month" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Jumlah (Rp) *</label>
+                        <input type="number" class="form-control" id="amount" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Catatan</label>
+                        <textarea class="form-control" id="notes" rows="2"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    let paymentsData = [];
+
+    async function initPaymentsPage() {
+        await loadPayments();
+        await loadResidents();
+    }
+
+    async function loadPayments() {
+        const status = document.getElementById('filterStatus').value;
+        const month = document.getElementById('filterMonth').value;
+
+        const params = {};
+        if (status) params.status = status;
+        if (month) params.month = month;
+
+        paymentsData = await window.adminDashboard.loadPayments(params);
+        displayPayments(paymentsData);
+        calculateStats(paymentsData);
+    }
+
+    function displayPayments(payments) {
+        const tbody = document.getElementById('paymentsTableBody');
+
+        if (payments.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-muted">Tidak ada data</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = payments.map(p => `
+        <tr>
+            <td>${p.resident?.user?.name || '-'}</td>
+            <td>${p.room?.room_number || '-'}</td>
+            <td>${formatDate(p.month)}</td>
+            <td>${formatCurrency(p.amount)}</td>
+            <td><span class="badge ${getStatusBadge(p.status)}">${p.status}</span></td>
+            <td>${p.payment_date ? formatDate(p.payment_date) : '-'}</td>
+            <td>
+                ${p.status === 'pending' ? `
+                    <button class="btn btn-sm btn-success" onclick="markAsPaid(${p.id})" title="Tandai Lunas">
+                        <i class="fas fa-check"></i>
+                    </button>
+                ` : ''}
+                ${p.status === 'paid' ? `
+                    <button class="btn btn-sm btn-info" onclick="viewReceipt(${p.id})" title="Lihat Bukti">
+                        <i class="fas fa-file-invoice"></i>
+                    </button>
+                ` : ''}
+            </td>
+        </tr>
+    `).join('');
+    }
+
+    function calculateStats(payments) {
+        const stats = payments.reduce((acc, p) => {
+            if (p.status === 'paid') acc.paid += p.amount;
+            else if (p.status === 'pending') acc.pending += p.amount;
+            else if (p.status === 'overdue') acc.overdue += p.amount;
+            return acc;
+        }, { paid: 0, pending: 0, overdue: 0 });
+
+        document.getElementById('totalPaid').textContent = formatCurrency(stats.paid);
+        document.getElementById('totalPending').textContent = formatCurrency(stats.pending);
+        document.getElementById('totalOverdue').textContent = formatCurrency(stats.overdue);
+
+        const thisMonth = new Date().toISOString().slice(0, 7);
+        const thisMonthTotal = payments
+            .filter(p => p.month && p.month.startsWith(thisMonth) && p.status === 'paid')
+            .reduce((sum, p) => sum + p.amount, 0);
+        document.getElementById('totalThisMonth').textContent = formatCurrency(thisMonthTotal);
+    }
+
+    async function loadResidents() {
+        const residents = await window.adminDashboard.loadResidents();
+        const select = document.getElementById('residentId');
+        select.innerHTML = '<option value="">Pilih Penghuni</option>' +
+            residents.map(r => `<option value="${r.id}">${r.user?.name || 'Unknown'}</option>`).join('');
+    }
+
+    function showAddPaymentModal() {
+        document.getElementById('paymentForm').reset();
+        new bootstrap.Modal(document.getElementById('paymentModal')).show();
+    }
+
+    async function savePayment(event) {
+        event.preventDefault();
+
+        const paymentData = {
+            resident_id: parseInt(document.getElementById('residentId').value),
+            month: document.getElementById('month').value,
+            amount: parseFloat(document.getElementById('amount').value),
+            notes: document.getElementById('notes').value
+        };
+
+        try {
+            await window.adminDashboard.createPayment(paymentData);
+            alert('Pembayaran berhasil ditambahkan!');
+            bootstrap.Modal.getInstance(document.getElementById('paymentModal')).hide();
+            await loadPayments();
+        } catch (error) {
+            alert('Error: ' + error.message);
+        }
+    }
+
+    async function markAsPaid(id) {
+        if (!confirm('Tandai pembayaran ini sebagai lunas?')) return;
+
+        try {
+            await window.adminDashboard.updatePaymentStatus(id, 'paid', new Date().toISOString().split('T')[0]);
+            alert('Pembayaran berhasil ditandai lunas!');
+            await loadPayments();
+        } catch (error) {
+            alert('Error: ' + error.message);
+        }
+    }
+
+    function viewReceipt(id) {
+        alert('Fitur lihat bukti pembayaran akan tersedia.');
+    }
+</script>

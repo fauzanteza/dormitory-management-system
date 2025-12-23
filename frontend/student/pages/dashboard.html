@@ -1,0 +1,119 @@
+<!-- Student Dashboard Page -->
+<div class="container-fluid">
+    <div class="row g-4 mb-4">
+        <!-- Welcome Card -->
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="mb-3">
+                        <i class="fas fa-hand-wave text-warning"></i>
+                        Selamat Datang, <span id="welcomeName"></span>!
+                    </h4>
+                    <p class="text-muted mb-0">Ini adalah dashboard Anda. Kelola kamar, pembayaran, dan permintaan
+                        perbaikan Anda di sini.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <!-- Room Info Card -->
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-bed fa-3x text-success mb-3"></i>
+                    <h5 class="mb-2">Kamar Saya</h5>
+                    <h3 class="fw-bold text-success" id="myRoomNumber">-</h3>
+                    <p class="text-muted small mb-0" id="myRoomDetails">Memuat informasi kamar...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Payments Card -->
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-money-bill-wave fa-3x text-warning mb-3"></i>
+                    <h5 class="mb-2">Tagihan Pending</h5>
+                    <h3 class="fw-bold text-warning" id="pendingPaymentsCount">-</h3>
+                    <p class="text-muted small mb-0">Pembayaran yang harus diselesaikan</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Repairs Card -->
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-tools fa-3x text-info mb-3"></i>
+                    <h5 class="mb-2">Perbaikan Aktif</h5>
+                    <h3 class="fw-bold text-info" id="activeRepairsCount">-</h3>
+                    <p class="text-muted small mb-0">Permintaan perbaikan yang sedang diproses</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upcoming Payment -->
+    <div class="row g-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Pembayaran Mendatang</h5>
+                </div>
+                <div class="card-body">
+                    <div id="upcomingPayment">
+                        <p class="text-muted">Memuat data...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    async function initDashboardPage() {
+        // Set welcome name
+        document.getElementById('welcomeName').textContent = window.auth.user.name;
+
+        // Load dashboard stats
+        const stats = await window.studentDashboard.loadDashboardStats();
+
+        if (stats) {
+            // Update room info
+            if (stats.my_room) {
+                document.getElementById('myRoomNumber').textContent = stats.my_room.room_number || '-';
+                document.getElementById('myRoomDetails').textContent =
+                    `${stats.my_room.building || ''} - ${stats.my_room.floor ? 'Lantai ' + stats.my_room.floor : ''}`;
+            } else {
+                document.getElementById('myRoomNumber').textContent = 'Belum Ada';
+                document.getElementById('myRoomDetails').textContent = 'Anda belum memiliki kamar';
+            }
+
+            // Update counts
+            document.getElementById('pendingPaymentsCount').textContent = stats.pending_payments || 0;
+            document.getElementById('activeRepairsCount').textContent = stats.active_repairs || 0;
+
+            // Update upcoming payment
+            if (stats.upcoming_payment && stats.upcoming_payment.id) {
+                const payment = stats.upcoming_payment;
+                document.getElementById('upcomingPayment').innerHTML = `
+                <div class="alert alert-warning">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">Tagihan ${formatDate(payment.month)}</h6>
+                            <p class="mb-0"><strong>${formatCurrency(payment.amount)}</strong></p>
+                        </div>
+                        <a href="#" onclick="loadPage('payments')" class="btn btn-warning">
+                            <i class="fas fa-arrow-right"></i> Bayar Sekarang
+                        </a>
+                    </div>
+                </div>
+            `;
+            } else {
+                document.getElementById('upcomingPayment').innerHTML =
+                    '<p class="text-muted">Tidak ada tagihan mendatang</p>';
+            }
+        }
+    }
+</script>

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="id" class="admin">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Sistem Asrama</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../common/css/admin.css">
+</head>
+
+<body class="admin">
+    <!-- Admin Navigation -->
+    <nav class="navbar navbar-dark bg-dark fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-university me-2"></i>
+                <span class="fw-bold">Sistem Asrama - Admin Panel</span>
+            </a>
+            <div class="d-flex align-items-center">
+                <div class="dropdown">
+                    <button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-user-cog me-2"></i>
+                        <span id="adminName">Administrator</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#" onclick="loadPage('profile')">
+                                <i class="fas fa-user me-2"></i>Profil
+                            </a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item text-danger" href="#" onclick="logout()">
+                                <i class="fas fa-sign-out-alt me-2"></i>Logout
+                            </a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Admin Sidebar -->
+    <div class="container-fluid">
+        <div class="row">
+            <nav id="sidebarMenu" class="col-md-3 col-lg-2 sidebar">
+                <div class="position-sticky pt-3">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#" data-page="dashboard">
+                                <i class="fas fa-tachometer-alt"></i>Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-page="rooms">
+                                <i class="fas fa-bed"></i>Manajemen Kamar
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-page="bookings">
+                                <i class="fas fa-calendar-check"></i>Pemesanan Kamar
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-page="residents">
+                                <i class="fas fa-users"></i>Data Penghuni
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-page="payments">
+                                <i class="fas fa-money-bill-wave"></i>Pembayaran
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-page="repairs">
+                                <i class="fas fa-tools"></i>Perbaikan
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-page="users">
+                                <i class="fas fa-user-cog"></i>Manajemen User
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main Content Area -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <div
+                    class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2" id="pageTitle">Dashboard Admin</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="refreshData()">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Dynamic Content Container -->
+                <div id="contentContainer">
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status"></div>
+                        <p class="mt-2">Memuat dashboard...</p>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../common/js/auth.js"></script>
+    <script src="js/admin-app.js"></script>
+    <script>
+        // Initialize Admin App
+        document.addEventListener('DOMContentLoaded', function () {
+            // Check if user is admin
+            if (!window.auth || !window.auth.isAuthenticated()) {
+                window.location.href = '/login?role=admin';
+                return;
+            }
+
+            if (window.auth.user.role !== 'admin') {
+                alert('Akses ditolak. Anda bukan administrator.');
+                window.location.href = '/student';
+                return;
+            }
+
+            // Update admin name in navbar
+            document.getElementById('adminName').textContent = window.auth.user.name;
+
+            // Load dashboard initially
+            loadPage('dashboard');
+
+            // Setup navigation
+            document.querySelectorAll('[data-page]').forEach(link => {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const page = this.getAttribute('data-page');
+                    loadPage(page);
+
+                    // Update active state
+                    document.querySelectorAll('.nav-link').forEach(nav => {
+                        nav.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                });
+            });
+        });
+
+        function loadPage(page) {
+            const container = document.getElementById('contentContainer');
+            const title = document.getElementById('pageTitle');
+
+            // Set page title
+            const pageTitles = {
+                'dashboard': 'Dashboard Admin',
+                'rooms': 'Manajemen Kamar',
+                'bookings': 'Pemesanan Kamar',
+                'residents': 'Data Penghuni',
+                'payments': 'Pembayaran',
+                'repairs': 'Perbaikan',
+                'users': 'Manajemen User',
+                'profile': 'Profil Admin'
+            };
+            title.textContent = pageTitles[page] || 'Admin Panel';
+
+            // Show loading
+            container.innerHTML = `
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p class="mt-2">Memuat halaman...</p>
+                </div>
+            `;
+
+            // Load page content
+            fetch(`pages/${page}.html`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Page not found');
+                    }
+                    return response.text();
+                })
+                .then(html => {
+                    container.innerHTML = html;
+
+                    // Initialize page-specific scripts
+                    const initFunctionName = `init${page.charAt(0).toUpperCase() + page.slice(1)}Page`;
+                    if (typeof window[initFunctionName] === 'function') {
+                        window[initFunctionName]();
+                    }
+                })
+                .catch(error => {
+                    container.innerHTML = `
+                        <div class="alert alert-warning">
+                            <h5><i class="fas fa-exclamation-triangle me-2"></i>Halaman Belum Tersedia</h5>
+                            <p>Halaman "${page}" sedang dalam pengembangan.</p>
+                            <button class="btn btn-primary btn-sm" onclick="loadPage('dashboard')">
+                                <i class="fas fa-home me-1"></i> Kembali ke Dashboard
+                            </button>
+                        </div>
+                    `;
+                });
+        }
+
+        function refreshData() {
+            const currentPage = document.querySelector('.nav-link.active')?.getAttribute('data-page') || 'dashboard';
+            loadPage(currentPage);
+        }
+
+        function logout() {
+            if (confirm('Apakah Anda yakin ingin logout?')) {
+                window.auth.logout();
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -39,7 +39,25 @@ func AdminMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		role, exists := c.Get("role")
 		if !exists || role != "admin" {
-			c.JSON(http.StatusForbidden, gin.H{"error": "Admin access required"})
+			c.JSON(http.StatusForbidden, gin.H{
+				"error":    "Akses ditolak. Hanya untuk administrator.",
+				"redirect": "/student",
+			})
+			c.Abort()
+			return
+		}
+		c.Next()
+	}
+}
+
+func StudentMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		role, exists := c.Get("role")
+		if !exists || role != "student" {
+			c.JSON(http.StatusForbidden, gin.H{
+				"error":    "Akses ditolak. Hanya untuk mahasiswa.",
+				"redirect": "/admin",
+			})
 			c.Abort()
 			return
 		}

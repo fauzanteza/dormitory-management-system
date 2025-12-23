@@ -1,0 +1,120 @@
+<!-- Admin Repairs Management Page -->
+<div class="container-fluid">
+    <h4 class="mb-4"><i class="fas fa-tools me-2"></i>Manajemen Perbaikan</h4>
+
+    <!-- Filters -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <select class="form-select" id="filterStatus" onchange="loadRepairs()">
+                        <option value="">Semua Status</option>
+                        <option value="pending">Pending</option>
+                        <option value="in_progress">In Progress</option>
+                        <option value="completed">Completed</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" id="filterPriority" onchange="loadRepairs()">
+                        <option value="">Semua Prioritas</option>
+                        <option value="urgent">Urgent</option>
+                        <option value="high">High</option>
+                        <option value="medium">Medium</option>
+                        <option value="low">Low</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Repairs List -->
+    <div class="row" id="repairsContainer">
+        <div class="col-12 text-center py-5">
+            <div class="spinner-border text-primary"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let repairsData = [];
+
+    async function initRepairsPage() {
+        await loadRepairs();
+    }
+
+    async function loadRepairs() {
+        const status = document.getElementById('filterStatus').value;
+        const priority = document.getElementById('filterPriority').value;
+
+        const params = {};
+        if (status) params.status = status;
+        if (priority) params.priority = priority;
+
+        repairsData = await window.adminDashboard.loadRepairs(params);
+        displayRepairs(repairsData);
+    }
+
+    function displayRepairs(repairs) {
+        const container = document.getElementById('repairsContainer');
+
+        if (repairs.length === 0) {
+            container.innerHTML = '<div class="col-12 text-center py-5 text-muted">Tidak ada data</div>';
+            return;
+        }
+
+        container.innerHTML = repairs.map(r => `
+        <div class="col-md-6 col-lg-4 mb-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <h6 class="mb-0">${r.title}</h6>
+                        <span class="badge ${getPriorityBadge(r.priority)}">${r.priority}</span>
+                    </div>
+                    
+                    <p class="text-muted small mb-2">${r.description}</p>
+                    
+                    <div class="mb-2">
+                        <small><strong>Pelapor:</strong> ${r.resident?.user?.name || '-'}</small><br>
+                        <small><strong>Kamar:</strong> ${r.room?.room_number || '-'}</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <span class="badge ${getStatusBadge(r.status)}">${r.status}</span>
+                        <small class="text-muted ms-2">${formatDate(r.created_at)}</small>
+                    </div>
+                    
+                    ${r.status !== 'completed' ? `
+                        <select class="form-select form-select-sm" onchange="updateRepairStatus(${r.id}, this.value)">
+                            <option value="">Ubah Status</option>
+                            <option value="in_progress">In Progress</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                    ` : ''}
+                </div>
+            </div>
+        </div>
+    `).join('');
+    }
+
+    async function updateRepairStatus(id, status) {
+        if (!status) return;
+
+        try {
+            await window.adminDashboard.updateRepairStatus(id, status);
+            alert('Status perbaikan berhasil diupdate!');
+            await loadRepairs();
+        } catch (error) {
+            alert('Error: ' + error.message);
+        }
+    }
+
+    function getPriorityBadge(priority) {
+        const badges = {
+            'low': 'bg-secondary',
+            'medium': 'bg-info',
+            'high': 'bg-warning',
+            'urgent': 'bg-danger'
+        };
+        return badges[priority] || 'bg-secondary';
+    }
+</script>

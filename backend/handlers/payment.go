@@ -177,3 +177,28 @@ func (h *PaymentHandler) GetMonthlyReport(c *gin.Context) {
 
 	c.JSON(http.StatusOK, result)
 }
+
+func (h *PaymentHandler) GetMyPayments(c *gin.Context) {
+	userID, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+		return
+	}
+
+	var payments []models.Payment
+	query := h.DB.Preload("Resident.User").Preload("Room").
+		Joins("JOIN residents ON payments.resident_id = residents.id").
+		Where("residents.user_id = ?", userID)
+
+	// Filter by status if provided
+	if status := c.Query("status"); status != "" {
+		query = query.Where("payments.status = ?", status)
+	}
+
+	if err := query.Order("payments.month DESC").Find(&payments).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, payments)
+}

@@ -1,117 +1,191 @@
-# Sistem Informasi Manajemen Asrama Mahasiswa
+# Sistem Manajemen Asrama
 
-Sistem terintegrasi untuk pengelolaan asrama mahasiswa yang dibangun dengan Go, MySQL, dan HTML/CSS/JS.
+Sistem informasi manajemen asrama mahasiswa dengan antarmuka terpisah untuk Admin dan Mahasiswa.
 
-## Fitur Utama
-1. **Manajemen Kamar**
-   - Status kamar (tersedia, terisi, maintenance)
-   - Kapasitas dan okupansi
-   - Harga sewa bulanan
-2. **Manajemen Penghuni**
-   - Data mahasiswa
-   - Penempatan kamar
-   - Status keaktifan
-3. **Sistem Pembayaran**
-   - Pembayaran bulanan
-   - Status pembayaran (lunas, pending, terlambat)
-   - Laporan bulanan
-4. **Sistem Perbaikan**
-   - Pengajuan perbaikan
-   - Prioritas dan status
-   - Penugasan teknisi
+## 🚀 Fitur Utama
 
-## Teknologi Stack
-- **Backend**: Go + Gin Framework
-- **Database**: MySQL
-- **ORM**: GORM
-- **Authentication**: JWT
-- **Frontend**: HTML5, CSS3, JavaScript
-- **Charts**: Chart.js
-- **Tables**: DataTables
+### Admin Features
 
-## Instalasi dan Setup
+- **Dashboard** - Statistik sistem lengkap
+- **Manajemen Kamar** - CRUD kamar dengan filter
+- **Pemesanan** - Approve/reject pemesanan
+- **Data Penghuni** - Manajemen penghuni asrama
+- **Pembayaran** - Kelola pembayaran & monitoring
+- **Perbaikan** - Handle laporan perbaikan
+- **Manajemen User** - Kelola akun pengguna
+
+### Student Features
+
+- **Dashboard Personal** - Statistik pribadi
+- **Kamar Saya** - Info kamar & teman sekamar
+- **Pemesanan** - Pesan kamar tersedia
+- **Pembayaran** - Lihat & bayar tagihan
+- **Laporan Perbaikan** - Laporkan kerusakan
+- **Profil** - Edit profil & ganti password
+
+## 🛠️ Tech Stack
+
+**Backend:**
+
+- Go 1.21+
+- Gin Web Framework
+- GORM
+- JWT Authentication
+- MySQL Database
+
+**Frontend:**
+
+- HTML5 + Bootstrap 5
+- Vanilla JavaScript
+- Font Awesome Icons
+- Responsive Design
+
+## 📁 Struktur Proyek
+
+```
+dormitory-management-system/
+├── backend/
+│   ├── config/          # Configuration
+│   ├── handlers/        # API Handlers
+│   ├── middleware/      # Auth & Rate Limiting
+│   ├── models/          # Database Models
+│   ├── routes/          # API Routes
+│   ├── utils/           # Utilities
+│   └── main.go
+├── frontend/
+│   ├── admin/           # Admin Interface
+│   ├── student/         # Student Interface
+│   ├── common/          # Shared Resources
+│   └── auth/            # Login & Register
+├── database/
+│   └── schema.sql       # Database Schema
+└── README.md
+```
+
+## 🔧 Setup & Installation
 
 ### Prerequisites
-1. Go 1.21 atau versi terbaru
-2. MySQL 8.0 atau versi terbaru
-3. Git
 
-### Langkah Instalasi
+- Go 1.21 or higher
+- MySQL 5.7 or higher
+- Modern web browser
 
-#### 1. Clone Repository
+### Installation Steps
+
+1. **Clone Repository**
+
 ```bash
-git clone [repository-url]
+git clone <repository-url>
 cd dormitory-management-system
 ```
 
-#### 2. Setup Database
-```bash
-# Masuk ke MySQL sebagai root
-mysql -u root -p
+1. **Database Setup**
 
-# Jalankan script database
-source database/schema.sql
-source database/seed.sql
+```sql
+CREATE DATABASE dormitory_db;
 ```
 
-Atau gunakan script setup:
+Import schema:
+
 ```bash
-chmod +x scripts/setup.sh
-./scripts/setup.sh
+mysql -u root -p dormitory_db < database/schema.sql
 ```
 
-#### 3. Konfigurasi Environment
-```bash
-cd backend
-cp .env.example .env
-# Edit file .env dengan konfigurasi database Anda
+1. **Backend Configuration**
+
+Create `.env` file in `backend/` directory:
+
+```env
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=root
+DB_PASSWORD=your_password
+DB_NAME=dormitory_db
+JWT_SECRET=your-secret-key-here
+PORT=8080
 ```
 
-#### 4. Install Dependencies
+1. **Install Dependencies**
+
 ```bash
 cd backend
 go mod tidy
 ```
 
-#### 5. Jalankan Aplikasi
+1. **Run Server**
+
 ```bash
-cd backend
 go run main.go
 ```
-Aplikasi akan berjalan di http://localhost:8080
 
-### Akses Default
-**Admin**
-Email: admin@asrama.com
-Password: admin123
+Server will start at `http://localhost:8080`
 
-**Mahasiswa**
-Email: budi@student.com
-Password: admin123
+## 🎯 Usage
 
-## API Endpoints
+### Admin Access
 
-### Autentikasi
-- `POST /api/auth/login` - Login user
-- `POST /api/auth/register` - Registrasi user baru
+- URL: <http://localhost:8080/login?role=admin>
+- Default credentials:
+  - Email: `admin@example.com`
+  - Password: `admin123`
 
-### Kamar
-- `GET /api/rooms` - Get semua kamar
-- `GET /api/rooms/available` - Get kamar tersedia
-- `POST /api/rooms` - Tambah kamar baru (admin only)
-- `PUT /api/rooms/:id` - Update kamar (admin only)
-- `DELETE /api/rooms/:id` - Hapus kamar (admin only)
+### Student Access
 
-### Pembayaran
-- `GET /api/payments` - Get semua pembayaran
-- `POST /api/payments` - Buat pembayaran baru (admin only)
-- `PUT /api/payments/:id/status` - Update status pembayaran (admin only)
-- `GET /api/payments/report` - Get laporan bulanan
+- URL: <http://localhost:8080/login?role=student>
+- Register first or use default:
+  - Email: `budi@student.com`
+  - Password: `admin123`
 
-### Perbaikan
-- `GET /api/repairs` - Get semua permintaan perbaikan
-- `POST /api/repairs` - Buat permintaan perbaikan baru
-- `PUT /api/repairs/:id/status` - Update status perbaikan (admin only)
+## 📡 API Endpoints
 
-### Dashboard
-- `GET /api/dashboard/stats` - Get statistik dashboard
+### Authentication
+
+- `POST /api/auth/login` - Login
+- `POST /api/auth/register` - Register (Student)
+
+### Admin API (`/api/admin/*`)
+
+- Dashboard, Rooms, Bookings, Residents
+- Payments, Repairs, Users
+
+### Student API (`/api/student/*`)
+
+- Dashboard, My Room, Bookings
+- Payments, Repairs, Profile
+
+## 🔐 Security Features
+
+- JWT Token Authentication
+- Role-based Access Control
+- Rate Limiting (10 req/sec)
+- Password Hashing
+- Input Validation
+- CORS Protection
+
+## 📱 Screenshots
+
+*Coming soon...*
+
+## 🤝 Contributing
+
+1. Fork the project
+2. Create your feature branch
+3. Commit your changes
+4. Push to the branch
+5. Open a Pull Request
+
+## 📝 License
+
+This project is licensed under the MIT License.
+
+## 👥 Authors
+
+- Fauzan Teza
+
+## 📞 Support
+
+For support, email: <fauzan@example.com>
+
+---
+
+**Note:** Remember to change default credentials and JWT secret in production!

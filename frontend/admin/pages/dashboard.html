@@ -1,0 +1,127 @@
+<!-- Admin Dashboard Page -->
+<div class="container-fluid">
+    <div class="row g-4 mb-4">
+        <!-- Stats Cards -->
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="text-muted mb-1 small">Total Kamar</p>
+                        <h3 class="mb-0 fw-bold" id="totalRooms">-</h3>
+                    </div>
+                    <div class="stat-icon bg-primary bg-opacity-10 text-primary">
+                        <i class="fas fa-bed"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="text-muted mb-1 small">Penghuni Aktif</p>
+                        <h3 class="mb-0 fw-bold" id="totalResidents">-</h3>
+                    </div>
+                    <div class="stat-icon bg-success bg-opacity-10 text-success">
+                        <i class="fas fa-users"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="text-muted mb-1 small">Booking Pending</p>
+                        <h3 class="mb-0 fw-bold" id="pendingBookings">-</h3>
+                    </div>
+                    <div class="stat-icon bg-warning bg-opacity-10 text-warning">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="text-muted mb-1 small">Total Pendapatan</p>
+                        <h3 class="mb-0 fw-bold" id="totalRevenue">-</h3>
+                    </div>
+                    <div class="stat-icon bg-info bg-opacity-10 text-info">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Recent Bookings -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-calendar-check me-2"></i>Booking Terbaru</h5>
+                </div>
+                <div class="card-body">
+                    <div id="recentBookings">
+                        <p class="text-muted">Memuat data...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Repairs -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-tools me-2"></i>Perbaikan Terbaru</h5>
+                </div>
+                <div class="card-body">
+                    <div id="recentRepairs">
+                        <p class="text-muted">Memuat data...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    async function initDashboardPage() {
+        const stats = await window.adminDashboard.loadDashboardStats();
+
+        if (stats) {
+            document.getElementById('totalRooms').textContent = stats.total_rooms || 0;
+            document.getElementById('totalResidents').textContent = stats.total_residents || 0;
+            document.getElementById('pendingBookings').textContent = stats.pending_bookings || 0;
+            document.getElementById('totalRevenue').textContent = formatCurrency(stats.total_revenue || 0);
+        }
+
+        // Load recent bookings
+        const bookings = await window.adminDashboard.loadBookings({ limit: 5 });
+        const bookingsHtml = bookings.slice(0, 5).map(b => `
+        <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+            <div>
+                <strong>${b.user?.name || 'Unknown'}</strong>
+                <small class="d-block text-muted">Kamar ${b.room?.room_number || '-'}</small>
+            </div>
+            <span class="badge ${getStatusBadge(b.status)}">${b.status}</span>
+        </div>
+    `).join('');
+        document.getElementById('recentBookings').innerHTML = bookingsHtml || '<p class="text-muted">Tidak ada data</p>';
+
+        // Load recent repairs
+        const repairs = await window.adminDashboard.loadRepairs({ limit: 5 });
+        const repairsHtml = repairs.slice(0, 5).map(r => `
+        <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+            <div>
+                <strong>${r.title || 'No title'}</strong>
+                <small class="d-block text-muted">${r.priority || 'normal'}</small>
+            </div>
+            <span class="badge ${getStatusBadge(r.status)}">${r.status}</span>
+        </div>
+    `).join('');
+        document.getElementById('recentRepairs').innerHTML = repairsHtml || '<p class="text-muted">Tidak ada data</p>';
+    }
+</script>

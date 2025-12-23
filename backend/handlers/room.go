@@ -195,3 +195,25 @@ func (h *RoomHandler) AssignResident(c *gin.Context) {
 	tx.Commit()
 	c.JSON(http.StatusOK, gin.H{"message": "Resident assigned successfully"})
 }
+
+func (h *RoomHandler) GetMyRoom(c *gin.Context) {
+	userID, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+		return
+	}
+
+	var resident models.Resident
+	if err := h.DB.Preload("Room").Preload("Room.Residents.User").
+		Where("user_id = ?", userID).First(&resident).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Room not found"})
+		return
+	}
+
+	if resident.RoomID == nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "You are not assigned to any room yet"})
+		return
+	}
+
+	c.JSON(http.StatusOK, resident.Room)
+}

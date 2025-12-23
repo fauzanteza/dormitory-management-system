@@ -86,3 +86,50 @@ func (h *DashboardHandler) GetDashboardStats(c *gin.Context) {
 
 	c.JSON(http.StatusOK, stats)
 }
+
+func (h *DashboardHandler) GetStudentDashboardStats(c *gin.Context) {
+	userID, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+		return
+	}
+
+	var stats struct {
+		MyRoom          interface{} `json:"my_room"`
+		PendingPayments int64       `json:"pending_payments"`
+		ActiveRepairs   int64       `json:"active_repairs"`
+		UpcomingPayment interface{} `json:"upcoming_payment"`
+	}
+
+	// Get student's room
+	var resident models.Resident
+	if err := h.DB.Preload("Room").Where("user_id = ?", userID).First(&resident).Error; err == nil {
+		stats.MyRoom = resident.Room
+	}
+
+	// Get pending payments count
+	h.DB.Model(&models.Payment{}).
+		Joins("JOIN residents ON payments.resident_id = residents.id").
+		Where("residents.user_id = ? AND payments.status = ?", userID, "pending").
+		Count(&stats.PendingPayments)
+
+	// Get active repairs count
+	h.DB.Model(&models.RepairRequest{}).
+		Joins("JOIN residents ON repair_requests.resident_id = residents.id").
+		Where("residents.user_id = ? AND repair_requests.status IN ?",
+			userID, []string{"pending", "in_progress"}).
+		Count(&stats.ActiveRepairs)
+
+	// Get upcoming payment
+	var upcomingPayment models.Payment
+	h.DB.Preload("Room").
+		Joins("JOIN residents ON payments.resident_id = residents.id").
+		Where("residents.user_id = ? AND payments.status = ? AND payments.month >= ?",
+			userID, "pending", time.Now().Format("2006-01-01")).
+		Order("payments.month ASC").
+		First(&upcomingPayment)
+
+	stats.UpcomingPayment = upcomingPayment
+
+	c.JSON(http.StatusOK, stats)
+}
