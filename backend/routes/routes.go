@@ -62,11 +62,11 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, config *config.Config) {
 	}
 
 	// Serve static files
-	router.Static("/static", "./frontend")
-	router.StaticFile("/", "./frontend/html/index.html")
-	router.StaticFile("/login", "./frontend/html/login.html")
-	router.StaticFile("/dashboard", "./frontend/html/dashboard.html")
-	router.StaticFile("/rooms", "./frontend/html/rooms.html")
-	router.StaticFile("/payments", "./frontend/html/payments.html")
-	router.StaticFile("/repairs", "./frontend/html/repairs.html")
+	router.Static("/static", "../frontend")
+	router.StaticFile("/", "../frontend/html/index.html")
+	router.StaticFile("/login", "../frontend/html/login.html")
+	router.StaticFile("/dashboard", "../frontend/html/dashboard.html")
+	router.StaticFile("/rooms", "../frontend/html/rooms.html")
+	router.StaticFile("/payments", "../frontend/html/payments.html")
+	router.StaticFile("/repairs", "../frontend/html/repairs.html")
 }
