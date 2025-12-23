@@ -127,13 +127,21 @@
     async function saveRepair(event) {
         event.preventDefault();
 
-        const repairData = {
-            title: document.getElementById('title').value,
-            description: document.getElementById('description').value,
-            priority: document.getElementById('priority').value
-        };
-
         try {
+            // Get user's room first
+            const myRoom = await window.studentDashboard.loadMyRoom();
+            if (!myRoom || !myRoom.id) {
+                alert('Anda belum terdaftar di kamar manapun. Tidak dapat membuat laporan perbaikan.');
+                return;
+            }
+
+            const repairData = {
+                room_id: myRoom.id,
+                title: document.getElementById('title').value,
+                description: document.getElementById('description').value,
+                priority: document.getElementById('priority').value
+            };
+
             await window.studentDashboard.createRepair(repairData);
             alert('Laporan perbaikan berhasil dikirim!');
             bootstrap.Modal.getInstance(document.getElementById('repairModal')).hide();
