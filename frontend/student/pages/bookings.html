@@ -138,7 +138,11 @@
         if (!confirm('Anda yakin ingin memesan kamar ini?')) return;
 
         try {
-            await window.studentDashboard.createBooking({ room_id: roomId });
+            const today = new Date().toISOString().split('T')[0];
+            await window.studentDashboard.createBooking({
+                room_id: roomId,
+                start_date: today
+            });
             alert('Pemesanan berhasil! Menunggu persetujuan admin.');
             bootstrap.Modal.getInstance(document.getElementById('availableRoomsModal')).hide();
             await loadMyBookings();

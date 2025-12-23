@@ -207,7 +207,8 @@
             `;
 
             // Load page content
-            fetch(`pages/${page}.html`)
+            // Add timestamp to prevent caching during development
+            fetch(`pages/${page}.html?t=${new Date().getTime()}`)
                 .then(response => {
                     if (!response.ok) throw new Error('Page not found');
                     return response.text();

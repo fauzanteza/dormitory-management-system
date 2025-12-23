@@ -42,7 +42,6 @@ Sistem informasi manajemen asrama mahasiswa dengan antarmuka terpisah untuk Admi
 
 ## 📁 Struktur Proyek
 
-```
 dormitory-management-system/
 ├── backend/
 │   ├── config/          # Configuration
@@ -61,7 +60,6 @@ dormitory-management-system/
 ├── database/
 │   └── schema.sql       # Database Schema
 └── README.md
-```
 
 ## 🔧 Setup & Installation
 
