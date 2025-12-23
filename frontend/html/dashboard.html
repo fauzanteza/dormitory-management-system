@@ -109,6 +109,14 @@
             background: linear-gradient(135deg, var(--warning), #fbbf24);
         }
 
+        .stat-card.bookings {
+            border-left-color: var(--secondary);
+        }
+
+        .stat-icon.bookings {
+            background: linear-gradient(135deg, var(--secondary), #a78bfa);
+        }
+
         .chart-container {
             background: white;
             border-radius: 15px;
@@ -134,25 +142,51 @@
                     style="width: 80px; height: 80px;">
                     <i class="fas fa-user fa-2x text-primary"></i>
                 </div>
-                <h6 id="userName" class="mb-1">Admin</h6>
-                <small id="userRole" class="text-white-50">Administrator</small>
+                <h6 id="userName" class="mb-1">-</h6>
+                <small id="userRole" class="text-white-50">-</small>
             </div>
 
             <nav class="nav flex-column">
-                <a class="nav-link active" href="/dashboard">
+                <a class="nav-link active" href="/dashboard" id="menu-dashboard">
                     <i class="fas fa-tachometer-alt me-2"></i>Dashboard
                 </a>
-                <a class="nav-link" href="/rooms">
-                    <i class="fas fa-bed me-2"></i>Kamar
+
+                <!-- Admin: Bookings, User: Pemesanan Kamar -->
+                <a class="nav-link" href="/bookings" id="menu-bookings">
+                    <i class="fas fa-calendar-check me-2"></i><span id="label-bookings">Pemesanan</span>
                 </a>
-                <a class="nav-link" href="/payments">
+
+                <!-- Admin: Kamar, User: Kamar Saya -->
+                <a class="nav-link" href="/rooms" id="menu-rooms">
+                    <i class="fas fa-bed me-2"></i><span id="label-rooms">Kamar</span>
+                </a>
+
+                <a class="nav-link" href="/residents" id="menu-residents">
+                    <i class="fas fa-users me-2"></i>Penghuni
+                </a>
+
+                <a class="nav-link" href="/payments" id="menu-payments">
                     <i class="fas fa-money-bill-wave me-2"></i>Pembayaran
                 </a>
-                <a class="nav-link" href="/repairs">
+
+                <a class="nav-link" href="/repairs" id="menu-repairs">
                     <i class="fas fa-tools me-2"></i>Perbaikan
                 </a>
-                <div class="mt-4 pt-3 border-top border-white-10">
-                    <a class="nav-link text-danger" href="#" onclick="logout()">
+
+                <a class="nav-link" href="/users" id="menu-users">
+                    <i class="fas fa-user-cog me-2"></i>User
+                </a>
+
+                <!-- Admin Only: Laporan -->
+                <a class="nav-link" href="/reports" id="menu-reports" style="display: none;">
+                    <i class="fas fa-chart-bar me-2"></i>Laporan
+                </a>
+
+                <div class="mt-4 pt-4 border-top border-white-10">
+                    <a class="nav-link" href="/profile" id="menu-profile">
+                        <i class="fas fa-user-circle me-2"></i>Profil
+                    </a>
+                    <a class="nav-link text-danger" href="#" onclick="window.app.logout()">
                         <i class="fas fa-sign-out-alt me-2"></i>Logout
                     </a>
                 </div>
@@ -286,6 +320,20 @@
                                 </div>
                                 <div class="stat-icon rooms">
                                     <i class="fas fa-bed"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card bookings">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted mb-2">Booking Baru</h6>
+                                    <h3 class="mb-0">${stats.pending_bookings || 0}</h3>
+                                    <small class="text-muted">Menunggu Konfirmasi</small>
+                                </div>
+                                <div class="stat-icon bookings">
+                                    <i class="fas fa-calendar-check"></i>
                                 </div>
                             </div>
                         </div>

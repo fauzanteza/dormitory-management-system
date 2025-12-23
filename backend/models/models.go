@@ -22,6 +22,7 @@ type DashboardStats struct {
 	AvailableRooms  int64            `json:"available_rooms"`
 	TotalResidents  int64            `json:"total_residents"`
 	PendingPayments int64            `json:"pending_payments"`
+	PendingBookings int64            `json:"pending_bookings"`
 	TotalRevenue    float64          `json:"total_revenue"`
 	PendingRepairs  int64            `json:"pending_repairs"`
 	MonthlyRevenue  []MonthlyRevenue `json:"monthly_revenue"`

@@ -1,7 +1,6 @@
 -- Buat database
 CREATE DATABASE IF NOT EXISTS dormitory_management;
 USE dormitory_management;
-
 -- Tabel users (admin dan mahasiswa)
 CREATE TABLE users (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -13,7 +12,6 @@ CREATE TABLE users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
-
 -- Tabel rooms
 CREATE TABLE rooms (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -23,12 +21,11 @@ CREATE TABLE rooms (
     capacity INT DEFAULT 2,
     current_occupancy INT DEFAULT 0,
     status ENUM('available', 'occupied', 'maintenance') DEFAULT 'available',
-    monthly_rate DECIMAL(10,2) NOT NULL,
+    monthly_rate DECIMAL(10, 2) NOT NULL,
     description TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
-
 -- Tabel residents
 CREATE TABLE residents (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -41,16 +38,16 @@ CREATE TABLE residents (
     emergency_contact VARCHAR(20),
     status ENUM('active', 'inactive', 'graduated') DEFAULT 'active',
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (room_id) REFERENCES rooms(id) ON DELETE SET NULL
+    FOREIGN KEY (room_id) REFERENCES rooms(id) ON DELETE
+    SET NULL
 );
-
 -- Tabel payments
 CREATE TABLE payments (
     id INT PRIMARY KEY AUTO_INCREMENT,
     resident_id INT NOT NULL,
     room_id INT NOT NULL,
     month DATE NOT NULL,
-    amount DECIMAL(10,2) NOT NULL,
+    amount DECIMAL(10, 2) NOT NULL,
     payment_date DATE,
     status ENUM('paid', 'pending', 'overdue') DEFAULT 'pending',
     payment_method VARCHAR(50),
@@ -61,7 +58,6 @@ CREATE TABLE payments (
     FOREIGN KEY (room_id) REFERENCES rooms(id),
     UNIQUE KEY unique_payment (resident_id, month)
 );
-
 -- Tabel repair_requests
 CREATE TABLE repair_requests (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -70,7 +66,12 @@ CREATE TABLE repair_requests (
     title VARCHAR(200) NOT NULL,
     description TEXT NOT NULL,
     priority ENUM('low', 'medium', 'high') DEFAULT 'medium',
-    status ENUM('pending', 'in_progress', 'completed', 'cancelled') DEFAULT 'pending',
+    status ENUM(
+        'pending',
+        'in_progress',
+        'completed',
+        'cancelled'
+    ) DEFAULT 'pending',
     reported_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     completed_at TIMESTAMP NULL,
     assigned_to INT,
@@ -79,7 +80,6 @@ CREATE TABLE repair_requests (
     FOREIGN KEY (room_id) REFERENCES rooms(id),
     FOREIGN KEY (assigned_to) REFERENCES users(id)
 );
-
 -- Tabel notifications
 CREATE TABLE notifications (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -91,10 +91,25 @@ CREATE TABLE notifications (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
-
 -- Index untuk optimasi query
 CREATE INDEX idx_payments_status ON payments(status);
 CREATE INDEX idx_payments_month ON payments(month);
 CREATE INDEX idx_rooms_status ON rooms(status);
 CREATE INDEX idx_repair_status ON repair_requests(status);
 CREATE INDEX idx_repair_priority ON repair_requests(priority);
+-- Tabel bookings (Pemesanan Kamar)
+CREATE TABLE bookings (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    room_id INT NOT NULL,
+    start_date DATE NOT NULL,
+    duration_months INT DEFAULT 12,
+    notes TEXT,
+    status ENUM('pending', 'approved', 'rejected', 'cancelled') DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (room_id) REFERENCES rooms(id) ON DELETE CASCADE
+);
+CREATE INDEX idx_bookings_status ON bookings(status);
+CREATE INDEX idx_bookings_user ON bookings(user_id);

@@ -40,7 +40,7 @@ func (h *RepairHandler) GetRepairRequests(c *gin.Context) {
 			Where("residents.user_id = ?", userID)
 	}
 
-	if err := query.Order("created_at DESC").Find(&repairs).Error; err != nil {
+	if err := query.Order("reported_at DESC").Find(&repairs).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}

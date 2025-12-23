@@ -25,6 +25,7 @@
             min-height: 100vh;
             position: fixed;
             width: 250px;
+            z-index: 1000;
         }
 
         .sidebar .nav-link {
@@ -41,7 +42,76 @@
 
         .main-content {
             margin-left: 250px;
-            padding: 20px;
+            padding: 30px;
+        }
+
+        /* Card Style matching CarePet/Modern Look */
+        .room-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            background: white;
+            overflow: hidden;
+        }
+
+        .room-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .room-status {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-available {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-occupied {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-maintenance {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .room-icon {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        .empty-state {
+            border: 2px dashed #cbd5e1;
+            border-radius: 15px;
+            padding: 3rem;
+            text-align: center;
+            background-color: #f8fafc;
+        }
+
+        .btn-add {
+            background-color: #10b981;
+            /* Green like CarePet */
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 600;
+        }
+
+        .btn-add:hover {
+            background-color: #059669;
+            color: white;
         }
     </style>
 </head>
@@ -54,11 +124,17 @@
                 <h4 class="mb-0">Sistem Asrama</h4>
             </div>
             <nav class="nav flex-column">
-                <a class="nav-link" href="/dashboard"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a>
-                <a class="nav-link active" href="/rooms"><i class="fas fa-bed me-2"></i>Kamar</a>
-                <a class="nav-link" href="/payments"><i class="fas fa-money-bill-wave me-2"></i>Pembayaran</a>
-                <a class="nav-link" href="/repairs"><i class="fas fa-tools me-2"></i>Perbaikan</a>
-                <div class="mt-4 pt-3 border-top border-white-10">
+                <a class="nav-link" href="/dashboard" id="menu-dashboard"><i
+                        class="fas fa-tachometer-alt me-2"></i>Dashboard</a>
+                <a class="nav-link active" href="/rooms" id="menu-rooms"><i class="fas fa-bed me-2"></i>Kamar</a>
+                <a class="nav-link" href="/residents" id="menu-residents"><i class="fas fa-users me-2"></i>Penghuni</a>
+                <a class="nav-link" href="/payments" id="menu-payments"><i
+                        class="fas fa-money-bill-wave me-2"></i>Pembayaran</a>
+                <a class="nav-link" href="/repairs" id="menu-repairs"><i class="fas fa-tools me-2"></i>Perbaikan</a>
+                <a class="nav-link" href="/users" id="menu-users"><i class="fas fa-user-cog me-2"></i>User</a>
+                <div class="mt-4 pt-4 border-top border-white-10">
+                    <a class="nav-link" href="/profile" id="menu-profile"><i
+                            class="fas fa-user-circle me-2"></i>Profil</a>
                     <a class="nav-link text-danger" href="#" onclick="window.app.logout()"><i
                             class="fas fa-sign-out-alt me-2"></i>Logout</a>
                 </div>
@@ -68,35 +144,20 @@
 
     <div class="main-content">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2>Daftar Kamar</h2>
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addRoomModal" id="btnAddRoom"
+            <div>
+                <h2 class="fw-bold text-dark">Daftar Kamar</h2>
+                <p class="text-muted">Kelola data kamar asrama</p>
+            </div>
+            <button class="btn btn-add" data-bs-toggle="modal" data-bs-target="#addRoomModal" id="btnAddRoom"
                 style="display:none;">
                 <i class="fas fa-plus me-2"></i>Tambah Kamar
             </button>
         </div>
 
-        <div class="card">
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>No. Kamar</th>
-                                <th>Gedung</th>
-                                <th>Lantai</th>
-                                <th>Kapasitas</th>
-                                <th>Harga/Bulan</th>
-                                <th>Status</th>
-                                <th>Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="roomsTableBody">
-                            <!-- Data will be loaded here -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+        <div id="roomsContainer" class="row g-4">
+            <!-- Rooms/Empty State will be loaded here -->
         </div>
+
     </div>
 
     <!-- Add Room Modal -->
@@ -111,11 +172,16 @@
                     <form id="addRoomForm">
                         <div class="mb-3">
                             <label class="form-label">Nomor Kamar</label>
-                            <input type="text" class="form-control" name="room_number" required>
+                            <input type="text" class="form-control" name="room_number" required
+                                placeholder="Contoh: A-101">
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Gedung</label>
-                            <input type="text" class="form-control" name="building" required>
+                            <select class="form-select" name="building" required>
+                                <option value="Gedung A">Gedung A</option>
+                                <option value="Gedung B">Gedung B</option>
+                                <option value="Gedung C">Gedung C</option>
+                            </select>
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
@@ -133,7 +199,7 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Deskripsi</label>
-                            <textarea class="form-control" name="description"></textarea>
+                            <textarea class="form-control" name="description" rows="3"></textarea>
                         </div>
                         <button type="submit" class="btn btn-primary w-100">Simpan</button>
                     </form>
@@ -146,6 +212,11 @@
     <script src="/frontend/js/app.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
+            // Check auth state immediately
+            if (!window.app.token) {
+                // But wait, if they navigated manually to /rooms? App.js handles it.
+            }
+
             const user = await window.app.loadUserProfile();
             if (user && user.role === 'admin') {
                 document.getElementById('btnAddRoom').style.display = 'block';
@@ -183,35 +254,120 @@
         });
 
         async function loadRooms() {
-            try {
-                const response = await window.app.fetchWithAuth('/api/rooms');
-                const rooms = await response.json();
-                const tbody = document.getElementById('roomsTableBody');
+            const container = document.getElementById('roomsContainer');
+            container.innerHTML = '<div class="col-12 text-center"><div class="spinner-border text-primary" role="status"></div></div>';
 
-                tbody.innerHTML = rooms.map(room => `
-                    <tr>
-                        <td>${room.room_number}</td>
-                        <td>${room.building}</td>
-                        <td>${room.floor}</td>
-                        <td>${room.current_occupancy}/${room.capacity}</td>
-                        <td>${window.app.formatCurrency(room.monthly_rate)}</td>
-                        <td>
-                            <span class="badge bg-${room.status === 'available' ? 'success' : room.status === 'occupied' ? 'danger' : 'warning'}">
-                                ${room.status}
+            try {
+                // Determine user role
+                const user = window.app.user;
+                if (!user) {
+                    // Should be handled by nav guard via app.js
+                    return;
+                }
+
+                let rooms = [];
+
+                if (user.role === 'admin') {
+                    // Admin sees all rooms
+                    const response = await window.app.fetchWithAuth('/api/rooms');
+                    if (!response) return;
+                    rooms = await response.json();
+                } else {
+                    // Student sees only their assigned room
+                    // We can use /api/profile which returns nested Resident.Room
+                    const response = await window.app.fetchWithAuth('/api/profile');
+                    if (!response) return;
+                    const userData = await response.json();
+
+                    if (userData.resident && userData.resident.room) {
+                        rooms = [userData.resident.room];
+                    } else {
+                        rooms = []; // Student has no room
+                    }
+                }
+
+                if (rooms.length === 0) {
+                    const emptyMessage = user.role === 'admin'
+                        ? 'Belum ada kamar. Mulai dengan menambahkan kamar asrama Anda.'
+                        : 'Anda belum terdaftar di kamar manapun. Hubungi Admin.';
+
+                    container.innerHTML = `
+                        <div class="col-12">
+                            <div class="empty-state">
+                                <i class="fas fa-bed fa-4x text-muted mb-3"></i>
+                                <h3>Data Tidak Ditemukan</h3>
+                                <p class="text-muted">${emptyMessage}</p>
+                            </div>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = rooms.map(room => `
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card room-card h-100 position-relative">
+                            <span class="room-status status-${room.status}">
+                                ${room.status === 'available' ? 'Tersedia' : room.status === 'occupied' ? 'Terisi' : 'Perbaikan'}
                             </span>
-                        </td>
-                        <td>
-                             <button class="btn btn-sm btn-info text-white" onclick="viewRoom(${room.id})"><i class="fas fa-eye"></i></button>
-                        </td>
-                    </tr>
+                            <div class="card-body p-4 text-center">
+                                <div class="room-icon">
+                                    <i class="fas fa-door-closed"></i>
+                                </div>
+                                <h3 class="card-title fw-bold mb-1">${room.room_number}</h3>
+                                <p class="text-muted mb-3">${room.building} &bull; Lt. ${room.floor}</p>
+                                
+                                <div class="d-flex justify-content-center gap-4 mb-4">
+                                    <div class="text-center">
+                                        <small class="text-muted d-block">Kapasitas</small>
+                                        <span class="fw-bold">${room.capacity} Org</span>
+                                    </div>
+                                    <div class="text-center">
+                                        <small class="text-muted d-block">Terisi</small>
+                                        <span class="fw-bold text-primary">${room.current_occupancy} Org</span>
+                                    </div>
+                                </div>
+
+                                <div class="border-top pt-3">
+                                    <h5 class="text-primary fw-bold mb-3">${window.app.formatCurrency(room.monthly_rate)}<small class="text-muted fs-6">/bln</small></h5>
+                                    
+                                    ${user.role === 'admin' ? `
+                                    <div class="d-grid gap-2">
+                                        <button class="btn btn-outline-primary btn-sm" onclick="viewRoom(${room.id})">Detail Kamar</button>
+                                        <button class="btn btn-light btn-sm text-danger" onclick="deleteRoom(${room.id})">Hapus</button>
+                                    </div>
+                                    ` : `
+                                    <div class="alert alert-info py-2 small mb-0">
+                                        <i class="fas fa-info-circle me-1"></i> Ini adalah kamar Anda
+                                    </div>
+                                    `}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 `).join('');
             } catch (error) {
                 console.error('Error loading rooms:', error);
+                container.innerHTML = `
+                    <div class="col-12 text-center text-danger">
+                        <p>Gagal memuat data kamar. Pastikan server berjalan.</p>
+                    </div>
+                `;
             }
         }
 
+        async function deleteRoom(id) {
+            if (!confirm('Yakin ingin menghapus kamar ini?')) return;
+            try {
+                const response = await window.app.fetchWithAuth('/api/rooms/' + id, { method: 'DELETE' });
+                if (response.ok) {
+                    window.app.showToast('Kamar dihapus');
+                    loadRooms();
+                }
+            } catch (e) { alert('Gagal hapus'); }
+        }
+
         function viewRoom(id) {
-            alert('Fitur detail kamar ID: ' + id + ' belum diimplementasikan di demo ini.');
+            alert('Fitur detail kamar ID: ' + id + ' (Coming Soon)');
         }
     </script>
 </body>

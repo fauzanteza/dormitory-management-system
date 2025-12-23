@@ -39,6 +39,9 @@ func (h *DashboardHandler) GetDashboardStats(c *gin.Context) {
 	// Repair statistics
 	h.DB.Model(&models.RepairRequest{}).Where("status = ?", "pending").Count(&stats.PendingRepairs)
 
+	// Booking statistics
+	h.DB.Model(&models.Booking{}).Where("status = ?", "pending").Count(&stats.PendingBookings)
+
 	// Monthly revenue for last 6 months
 	var monthlyRevenues []struct {
 		Month   string  `json:"month"`

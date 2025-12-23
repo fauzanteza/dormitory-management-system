@@ -53,12 +53,20 @@
                 <div class="bg-white rounded-circle p-2 me-3"><i class="fas fa-university text-primary fa-lg"></i></div>
                 <h4 class="mb-0">Sistem Asrama</h4>
             </div>
+
             <nav class="nav flex-column">
-                <a class="nav-link" href="/dashboard"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a>
-                <a class="nav-link" href="/rooms"><i class="fas fa-bed me-2"></i>Kamar</a>
-                <a class="nav-link" href="/payments"><i class="fas fa-money-bill-wave me-2"></i>Pembayaran</a>
-                <a class="nav-link active" href="/repairs"><i class="fas fa-tools me-2"></i>Perbaikan</a>
-                <div class="mt-4 pt-3 border-top border-white-10">
+                <a class="nav-link" href="/dashboard" id="menu-dashboard"><i
+                        class="fas fa-tachometer-alt me-2"></i>Dashboard</a>
+                <a class="nav-link" href="/rooms" id="menu-rooms"><i class="fas fa-bed me-2"></i>Kamar</a>
+                <a class="nav-link" href="/residents" id="menu-residents"><i class="fas fa-users me-2"></i>Penghuni</a>
+                <a class="nav-link" href="/payments" id="menu-payments"><i
+                        class="fas fa-money-bill-wave me-2"></i>Pembayaran</a>
+                <a class="nav-link active" href="/repairs" id="menu-repairs"><i
+                        class="fas fa-tools me-2"></i>Perbaikan</a>
+                <a class="nav-link" href="/users" id="menu-users"><i class="fas fa-user-cog me-2"></i>User</a>
+                <div class="mt-4 pt-4 border-top border-white-10">
+                    <a class="nav-link" href="/profile" id="menu-profile"><i
+                            class="fas fa-user-circle me-2"></i>Profil</a>
                     <a class="nav-link text-danger" href="#" onclick="window.app.logout()"><i
                             class="fas fa-sign-out-alt me-2"></i>Logout</a>
                 </div>

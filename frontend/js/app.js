@@ -79,12 +79,16 @@ class DormitoryApp {
     }
 
     async loadUserProfile() {
+        if (!this.token) return null;
         try {
-            const response = await this.fetchWithAuth(`${this.baseURL}/profile`);
-            if (response) {
+            const response = await this.fetchWithAuth('/api/profile');
+            if (response.ok) {
                 const user = await response.json();
-                localStorage.setItem('user', JSON.stringify(user));
                 this.user = user;
+                localStorage.setItem('user', JSON.stringify(user));
+                this.updateUI();
+                this.updateSidebar();
+                this.checkAccess(); // Check page access
                 return user;
             }
         } catch (error) {
@@ -92,10 +96,56 @@ class DormitoryApp {
         }
         return null;
     }
+
+    updateUI() {
+        // Update common UI elements if they exist
+        const nameEl = document.getElementById('userName');
+        const roleEl = document.getElementById('userRole');
+        if (nameEl && this.user) nameEl.textContent = this.user.name;
+        if (roleEl && this.user) roleEl.textContent = this.user.role === 'admin' ? 'Administrator' : 'Mahasiswa';
+    }
+
+    updateSidebar() {
+        if (!this.user) return;
+
+        const role = this.user.role;
+
+        // Admin Specifics
+        if (role === 'admin') {
+            const reportBtn = document.getElementById('menu-reports');
+            if (reportBtn) reportBtn.style.display = 'block';
+        }
+
+        // Student Specifics
+        if (role !== 'admin') {
+            // Hide Admin Menus
+            const adminMenus = ['menu-residents', 'menu-users', 'menu-reports'];
+            adminMenus.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.display = 'none';
+            });
+
+            // Rename 'Kamar' to 'Kamar Saya'
+            const kamarLabel = document.getElementById('label-rooms');
+            if (kamarLabel) kamarLabel.textContent = 'Kamar Saya';
+        }
+    }
+
+    checkAccess() {
+        const path = window.location.pathname;
+        if (this.user.role !== 'admin') {
+            // Block access to admin-only pages
+            if (path.includes('/residents') || path.includes('/users')) {
+                alert('Akses ditolak. Halaman ini hanya untuk Administrator.');
+                window.location.href = '/dashboard';
+            }
+        }
+    }
 }
 
 // Initialize global app instance
-window.app = new DormitoryApp();
+const app = new DormitoryApp();
+window.app = app; // Expose to window
 
 // Navigation guard
 document.addEventListener('DOMContentLoaded', function () {

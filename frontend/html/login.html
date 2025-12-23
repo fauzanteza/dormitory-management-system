@@ -9,94 +9,168 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #f0f2f5;
             min-height: 100vh;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            align-items: center;
+        }
+
+        .login-container {
+            max-width: 900px;
+            margin: 0 auto;
+            width: 100%;
         }
 
         .login-card {
-            background: rgba(255, 255, 255, 0.95);
+            background: white;
             border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            min-height: 500px;
         }
 
-        .login-card:hover {
-            transform: translateY(-5px);
+        .role-selector {
+            background: #f8f9fa;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            height: 100%;
+            border-right: 1px solid #eee;
         }
 
-        .btn-login {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
+        .role-btn {
+            padding: 1.5rem;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            background: white;
+        }
+
+        .role-btn:hover {
+            border-color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .role-btn.active {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .role-btn.active .role-icon {
+            background: #667eea;
             color: white;
-            padding: 12px;
-            border-radius: 10px;
-            font-weight: 600;
+        }
+
+        .role-icon {
+            width: 50px;
+            height: 50px;
+            background: #e9ecef;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: #6c757d;
+            margin-right: 1rem;
             transition: all 0.3s ease;
         }
 
-        .btn-login:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        .login-form-section {
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
-        .form-control:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.25);
+        .form-title {
+            font-weight: 800;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        .btn-primary:hover {
+            background: #5a67d8;
         }
     </style>
 </head>
 
 <body>
-    <div class="container py-5">
-        <div class="row justify-content-center">
-            <div class="col-md-6 col-lg-5">
-                <div class="login-card p-4 p-md-5">
-                    <div class="text-center mb-4">
-                        <div class="d-inline-flex align-items-center justify-content-center bg-primary rounded-circle mb-3"
-                            style="width: 80px; height: 80px;">
-                            <i class="fas fa-university fa-2x text-white"></i>
+    <div class="container login-container">
+        <div class="card login-card">
+            <div class="row g-0 h-100">
+                <!-- Role Selection -->
+                <div class="col-md-5">
+                    <div class="role-selector">
+                        <h4 class="fw-bold mb-4 px-2">Pilih Akses Sesuai Role</h4>
+
+                        <div class="role-btn active" onclick="selectRole('admin')" id="btn-admin">
+                            <div class="role-icon">
+                                <i class="fas fa-user-shield"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold mb-1">Administrator</h6>
+                                <small class="text-muted">Untuk pengelola asrama</small>
+                            </div>
                         </div>
-                        <h2 class="fw-bold">Login Sistem</h2>
-                        <p class="text-muted">Masuk ke sistem manajemen asrama</p>
+
+                        <div class="role-btn" onclick="selectRole('student')" id="btn-student">
+                            <div class="role-icon">
+                                <i class="fas fa-user-graduate"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold mb-1">Mahasiswa</h6>
+                                <small class="text-muted">Untuk penghuni asrama</small>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 text-center">
+                            <a href="/" class="text-decoration-none text-muted small">
+                                <i class="fas fa-arrow-left me-1"></i> Kembali ke Beranda
+                            </a>
+                        </div>
                     </div>
+                </div>
 
-                    <form id="loginForm">
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-envelope"></i></span>
-                                <input type="email" class="form-control" id="email" placeholder="email@contoh.com"
-                                    required>
-                            </div>
+                <!-- Login Form -->
+                <div class="col-md-7">
+                    <div class="login-form-section h-100">
+                        <div id="admin-login-content">
+                            <h3 class="form-title text-primary">Login Administrator</h3>
+                            <p class="text-muted mb-4">Masuk untuk mengelola sistem asrama.</p>
+
+                            <form id="loginForm">
+                                <input type="hidden" id="selectedRole" value="admin">
+                                <div class="mb-3">
+                                    <label class="form-label">Email Admin</label>
+                                    <input type="email" class="form-control form-control-lg" id="email"
+                                        placeholder="admin@example.com" required>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label">Password</label>
+                                    <input type="password" class="form-control form-control-lg" id="password" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100 btn-lg mb-3">Masuk Sebagai
+                                    Admin</button>
+                                <div class="text-center">
+                                    <small class="text-muted">Lupa password? Hubungi IT Support</small>
+                                </div>
+                            </form>
                         </div>
-
-                        <div class="mb-3">
-                            <label for="password" class="form-label">Password</label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                                <input type="password" class="form-control" id="password"
-                                    placeholder="Masukkan password" required>
-                            </div>
-                        </div>
-
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-login">
-                                <i class="fas fa-sign-in-alt me-2"></i>Login
-                            </button>
-                            <button type="button" class="btn btn-outline-primary" onclick="demoLogin('admin')">
-                                <i class="fas fa-user-shield me-2"></i>Login sebagai Admin
-                            </button>
-                            <button type="button" class="btn btn-outline-success" onclick="demoLogin('student')">
-                                <i class="fas fa-user-graduate me-2"></i>Login sebagai Mahasiswa
-                            </button>
-                        </div>
-                    </form>
-
-                    <div class="text-center mt-4">
-                        <a href="/" class="text-decoration-none">
-                            <i class="fas fa-arrow-left me-2"></i>Kembali ke Beranda
-                        </a>
                     </div>
                 </div>
             </div>
@@ -104,52 +178,81 @@
     </div>
 
     <script>
+        // Check URL params for pre-selection
+        const urlParams = new URLSearchParams(window.location.search);
+        const roleParam = urlParams.get('role');
+        if (roleParam) {
+            selectRole(roleParam);
+        }
+
+        function selectRole(role) {
+            // Update UI buttons
+            document.querySelectorAll('.role-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`btn-${role}`).classList.add('active');
+
+            // Update Form Content
+            const titleEl = document.querySelector('.form-title');
+            const descEl = document.querySelector('.form-title + p');
+            const btnEl = document.querySelector('button[type="submit"]');
+            const labelEl = document.querySelector('label[class="form-label"]');
+
+            document.getElementById('selectedRole').value = role;
+            document.getElementById('email').value = ''; // clear input
+            document.getElementById('password').value = ''; // clear input
+
+            if (role === 'admin') {
+                titleEl.textContent = 'Login Administrator';
+                titleEl.className = 'form-title text-primary';
+                descEl.textContent = 'Masuk untuk mengelola sistem asrama.';
+                btnEl.textContent = 'Masuk Sebagai Admin';
+                btnEl.className = 'btn btn-primary w-100 btn-lg mb-3';
+                labelEl.textContent = 'Email Admin';
+                // Pre-fill for demo convenience if needed, otherwise leave blank
+                // document.getElementById('email').value = 'admin@example.com';
+            } else {
+                titleEl.textContent = 'Login Mahasiswa';
+                titleEl.className = 'form-title text-success';
+                descEl.textContent = 'Masuk untuk mengakses layanan asrama.';
+                btnEl.textContent = 'Masuk Sebagai Mahasiswa';
+                btnEl.className = 'btn btn-success w-100 btn-lg mb-3';
+                labelEl.textContent = 'Email Mahasiswa';
+                // Pre-fill
+                // document.getElementById('email').value = 'student@example.com';
+            }
+        }
+
         document.getElementById('loginForm').addEventListener('submit', async function (e) {
             e.preventDefault();
-
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
+            // Removed client-side role check from form, backend handles auth based on email
 
             try {
                 const response = await fetch('/api/auth/login', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, password })
                 });
 
                 if (response.ok) {
                     const data = await response.json();
+
+                    // Optional: enforce role check if we really want to restrict "Admin Login" to only Admins
+                    // Logic: If I tried to login as Admin but the credential returned is student, reject?
+                    // For now, let's allow flexibility but the UI implies separation.
+
                     localStorage.setItem('token', data.token);
                     localStorage.setItem('user', JSON.stringify(data.user));
-
-                    if (data.user.role === 'admin') {
-                        window.location.href = '/dashboard';
-                    } else {
-                        window.location.href = '/dashboard';
-                    }
+                    window.location.href = '/dashboard';
                 } else {
-                    alert('Login gagal. Periksa email dan password Anda.');
+                    alert('Login gagal. Periksa email dan password.');
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('Terjadi kesalahan saat login.');
+                alert('Terjadi kesalahan.');
             }
         });
-
-        function demoLogin(role) {
-            if (role === 'admin') {
-                document.getElementById('email').value = 'admin@asrama.com';
-                document.getElementById('password').value = 'admin123';
-            } else {
-                document.getElementById('email').value = 'budi@student.com';
-                document.getElementById('password').value = 'admin123';
-            }
-        }
     </script>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
