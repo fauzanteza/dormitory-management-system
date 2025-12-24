@@ -45,12 +45,10 @@ go run main.go
 
 **Output yang benar:**
 
-```
 2025/12/24 01:XX:XX Database connected successfully
 2025/12/24 01:XX:XX Running auto migration...
 2025/12/24 01:XX:XX Database migration completed successfully
 [GIN-debug] Listening and serving HTTP on :8080
-```
 
 ✅ Jika muncul "Database migration completed successfully" → **Berhasil!**
 
@@ -106,9 +104,7 @@ go run main.go
 
 ### Cek Server
 
-```
 [GIN-debug] Listening and serving HTTP on :8080
-```
 
 ### Test Login
 
