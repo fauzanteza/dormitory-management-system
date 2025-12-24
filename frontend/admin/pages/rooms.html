@@ -2,16 +2,16 @@
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h4 class="mb-1">Manajemen Kamar</h4>
-            <p class="text-muted small mb-0">Kelola semua kamar asrama</p>
+            <h4 class="mb-1 animate__animated animate__fadeIn">Manajemen Kamar</h4>
+            <p class="text-muted small mb-0 animate__animated animate__fadeIn animate__delay-1s">Kelola semua kamar asrama</p>
         </div>
-        <button class="btn btn-primary" onclick="showAddRoomModal()">
+        <button class="btn btn-primary animate__animated animate__fadeIn" onclick="showAddRoomModal()">
             <i class="fas fa-plus me-2"></i>Tambah Kamar
         </button>
     </div>
 
     <!-- Filters -->
-    <div class="card mb-4">
+    <div class="card mb-4 animate__animated animate__fadeInUp">
         <div class="card-body">
             <div class="row g-3">
                 <div class="col-md-3">
@@ -39,7 +39,7 @@
     </div>
 
     <!-- Rooms Table -->
-    <div class="card">
+    <div class="card animate__animated animate__fadeInUp animate__delay-1s">
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-hover">
@@ -135,7 +135,15 @@
     let roomsData = [];
 
     async function initRoomsPage() {
-        await loadRooms();
+        try {
+            showLoading();
+            await loadRooms();
+        } catch (error) {
+            console.error('Error loading rooms:', error);
+            alert('Gagal memuat data kamar: ' + error.message);
+        } finally {
+            hideLoading();
+        }
     }
 
     async function loadRooms() {
@@ -165,7 +173,7 @@
 
         if (rooms.length === 0) {
             tbody.innerHTML = `
-            <tr>
+            <tr class="animate__animated animate__fadeIn">
                 <td colspan="8" class="text-center py-4 text-muted">
                     <i class="fas fa-inbox fa-3x mb-3"></i>
                     <p class="mb-0">Tidak ada data kamar</p>
@@ -175,8 +183,8 @@
             return;
         }
 
-        tbody.innerHTML = rooms.map(room => `
-        <tr>
+        tbody.innerHTML = rooms.map((room, index) => `
+        <tr class="animate__animated animate__fadeIn" style="animation-delay: ${index * 0.1}s">
             <td><strong>${room.room_number}</strong></td>
             <td>${room.building}</td>
             <td>${room.floor}</td>
@@ -185,15 +193,17 @@
             <td>${formatCurrency(room.monthly_rate)}</td>
             <td><span class="badge ${getStatusBadge(room.status)}">${room.status}</span></td>
             <td>
-                <button class="btn btn-sm btn-info" onclick="viewRoom(${room.id})" title="Detail">
-                    <i class="fas fa-eye"></i>
-                </button>
-                <button class="btn btn-sm btn-warning" onclick="editRoom(${room.id})" title="Edit">
-                    <i class="fas fa-edit"></i>
-                </button>
-                <button class="btn btn-sm btn-danger" onclick="deleteRoom(${room.id})" title="Hapus">
-                    <i class="fas fa-trash"></i>
-                </button>
+                <div class="btn-group btn-group-sm" role="group">
+                    <button class="btn btn-info" onclick="viewRoom(${room.id})" title="Detail">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="btn btn-warning" onclick="editRoom(${room.id})" title="Edit">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-danger" onclick="deleteRoom(${room.id})" title="Hapus">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
             </td>
         </tr>
     `).join('');
@@ -238,6 +248,7 @@
         };
 
         try {
+            showLoading();
             if (id) {
                 await window.adminDashboard.updateRoom(id, roomData);
                 alert('Kamar berhasil diupdate!');
@@ -250,6 +261,8 @@
             await loadRooms();
         } catch (error) {
             alert('Error: ' + error.message);
+        } finally {
+            hideLoading();
         }
     }
 
@@ -257,11 +270,14 @@
         if (!confirm('Apakah Anda yakin ingin menghapus kamar ini?')) return;
 
         try {
+            showLoading();
             await window.adminDashboard.deleteRoom(id);
             alert('Kamar berhasil dihapus!');
             await loadRooms();
         } catch (error) {
             alert('Error: ' + error.message);
+        } finally {
+            hideLoading();
         }
     }
 

@@ -2,16 +2,16 @@
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h4 class="mb-1">Manajemen Penghuni</h4>
-            <p class="text-muted small mb-0">Kelola data penghuni asrama</p>
+            <h4 class="mb-1 animate__animated animate__fadeIn">Manajemen Penghuni</h4>
+            <p class="text-muted small mb-0 animate__animated animate__fadeIn animate__delay-1s">Kelola data penghuni asrama</p>
         </div>
-        <button class="btn btn-primary" onclick="showAddResidentModal()">
+        <button class="btn btn-primary animate__animated animate__fadeIn" onclick="showAddResidentModal()">
             <i class="fas fa-plus me-2"></i>Tambah Penghuni
         </button>
     </div>
 
     <!-- Filters -->
-    <div class="card mb-4">
+    <div class="card mb-4 animate__animated animate__fadeInUp">
         <div class="card-body">
             <div class="row g-3">
                 <div class="col-md-3">
@@ -22,16 +22,21 @@
                         <option value="graduated">Graduated</option>
                     </select>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-6">
                     <input type="text" class="form-control" id="searchName" placeholder="Cari nama..."
                         onkeyup="loadResidents()">
+                </div>
+                <div class="col-md-3">
+                    <button class="btn btn-outline-primary w-100" onclick="loadResidents()">
+                        <i class="fas fa-search me-2"></i>Cari
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Residents Table -->
-    <div class="card">
+    <div class="card animate__animated animate__fadeInUp animate__delay-1s">
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-hover">
@@ -50,6 +55,7 @@
                         <tr>
                             <td colspan="7" class="text-center py-4">
                                 <div class="spinner-border text-primary"></div>
+                                <p class="mt-2 mb-0">Memuat data...</p>
                             </td>
                         </tr>
                     </tbody>
@@ -120,32 +126,51 @@
     let residentsData = [];
 
     async function initResidentsPage() {
-        await loadResidents();
-        await loadUsersAndRooms();
+        try {
+            showLoading();
+            await loadResidents();
+            await loadUsersAndRooms();
+        } catch (error) {
+            console.error('Error loading residents:', error);
+            alert('Gagal memuat data penghuni: ' + error.message);
+        } finally {
+            hideLoading();
+        }
     }
 
     async function loadResidents() {
-        const status = document.getElementById('filterStatus').value;
-        const search = document.getElementById('searchName').value;
+        try {
+            const status = document.getElementById('filterStatus').value;
+            const search = document.getElementById('searchName').value;
 
-        const params = {};
-        if (status) params.status = status;
-        if (search) params.name = search;
+            const params = {};
+            if (status) params.status = status;
+            if (search) params.name = search;
 
-        residentsData = await window.adminDashboard.loadResidents(params);
-        displayResidents(residentsData);
+            residentsData = await window.adminDashboard.loadResidents(params);
+            displayResidents(residentsData);
+        } catch (error) {
+            throw error;
+        }
     }
 
     function displayResidents(residents) {
         const tbody = document.getElementById('residentsTableBody');
 
         if (residents.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-muted">Tidak ada data</td></tr>';
+            tbody.innerHTML = `
+                <tr class="animate__animated animate__fadeIn">
+                    <td colspan="7" class="text-center py-4 text-muted">
+                        <i class="fas fa-users-slash fa-3x mb-3"></i>
+                        <p class="mb-0">Tidak ada data penghuni</p>
+                    </td>
+                </tr>
+            `;
             return;
         }
 
-        tbody.innerHTML = residents.map(r => `
-        <tr>
+        tbody.innerHTML = residents.map((r, index) => `
+        <tr class="animate__animated animate__fadeIn" style="animation-delay: ${index * 0.1}s">
             <td><strong>${r.user?.name || '-'}</strong></td>
             <td>${r.user?.email || '-'}</td>
             <td>${r.user?.phone || '-'}</td>
@@ -153,36 +178,43 @@
             <td><span class="badge ${getStatusBadge(r.status)}">${r.status}</span></td>
             <td>${r.check_in_date ? formatDate(r.check_in_date) : '-'}</td>
             <td>
-                <button class="btn btn-sm btn-info" onclick="viewResident(${r.id})" title="Detail">
-                    <i class="fas fa-eye"></i>
-                </button>
-                <button class="btn btn-sm btn-warning" onclick="editResident(${r.id})" title="Edit">
-                    <i class="fas fa-edit"></i>
-                </button>
-                <button class="btn btn-sm btn-danger" onclick="deleteResident(${r.id})" title="Hapus">
-                    <i class="fas fa-trash"></i>
-                </button>
+                <div class="btn-group btn-group-sm" role="group">
+                    <button class="btn btn-info" onclick="viewResident(${r.id})" title="Detail">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="btn btn-warning" onclick="editResident(${r.id})" title="Edit">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-danger" onclick="deleteResident(${r.id})" title="Hapus">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
             </td>
         </tr>
     `).join('');
     }
 
     async function loadUsersAndRooms() {
-        // Load users for dropdown
-        const users = await window.adminDashboard.loadUsers();
-        const userSelect = document.getElementById('userId');
-        userSelect.innerHTML = '<option value="">Pilih User</option>' +
-            users.filter(u => u.role === 'student').map(u =>
-                `<option value="${u.id}">${u.name} (${u.email})</option>`
-            ).join('');
+        try {
+            // Load users for dropdown
+            const users = await window.adminDashboard.loadUsers();
+            const userSelect = document.getElementById('userId');
+            userSelect.innerHTML = '<option value="">Pilih User</option>' +
+                users.filter(u => u.role === 'student').map(u =>
+                    `<option value="${u.id}">${u.name} (${u.email})</option>`
+                ).join('');
 
-        // Load rooms for dropdown
-        const rooms = await window.adminDashboard.loadRooms();
-        const roomSelect = document.getElementById('roomId');
-        roomSelect.innerHTML = '<option value="">Pilih Kamar</option>' +
-            rooms.filter(r => r.status === 'available').map(r =>
-                `<option value="${r.id}">Kamar ${r.room_number}</option>`
-            ).join('');
+            // Load rooms for dropdown
+            const rooms = await window.adminDashboard.loadRooms();
+            const roomSelect = document.getElementById('roomId');
+            roomSelect.innerHTML = '<option value="">Pilih Kamar</option>' +
+                rooms.filter(r => r.status === 'available' || r.status === 'occupied').map(r =>
+                    `<option value="${r.id}">Kamar ${r.room_number} (${r.status})</option>`
+                ).join('');
+        } catch (error) {
+            console.error('Error loading dropdowns:', error);
+            alert('Gagal memuat data dropdown: ' + error.message);
+        }
     }
 
     function showAddResidentModal() {
@@ -222,19 +254,12 @@
         };
 
         try {
+            showLoading();
             if (id) {
-                const response = await window.auth.fetchWithAuth(`/api/admin/residents/${id}`, {
-                    method: 'PUT',
-                    body: JSON.stringify(residentData)
-                });
-                if (!response.ok) throw new Error('Failed to update');
+                await window.adminDashboard.updateResident(id, residentData);
                 alert('Penghuni berhasil diupdate!');
             } else {
-                const response = await window.auth.fetchWithAuth('/api/admin/residents', {
-                    method: 'POST',
-                    body: JSON.stringify(residentData)
-                });
-                if (!response.ok) throw new Error('Failed to create');
+                await window.adminDashboard.createResident(residentData);
                 alert('Penghuni berhasil ditambahkan!');
             }
 
@@ -242,6 +267,8 @@
             await loadResidents();
         } catch (error) {
             alert('Error: ' + error.message);
+        } finally {
+            hideLoading();
         }
     }
 
@@ -249,14 +276,14 @@
         if (!confirm('Apakah Anda yakin ingin menghapus penghuni ini?')) return;
 
         try {
-            const response = await window.auth.fetchWithAuth(`/api/admin/residents/${id}`, {
-                method: 'DELETE'
-            });
-            if (!response.ok) throw new Error('Failed to delete');
+            showLoading();
+            await window.adminDashboard.deleteResident(id);
             alert('Penghuni berhasil dihapus!');
             await loadResidents();
         } catch (error) {
             alert('Error: ' + error.message);
+        } finally {
+            hideLoading();
         }
     }
 
@@ -264,6 +291,6 @@
         const resident = residentsData.find(r => r.id === id);
         if (!resident) return;
 
-        alert(`Detail Penghuni\n\nNama: ${resident.user?.name}\nEmail: ${resident.user?.email}\nKamar: ${resident.room?.room_number || 'Belum ada'}\nStatus: ${resident.status}`);
+        alert(`Detail Penghuni\n\nNama: ${resident.user?.name || '-'}\nEmail: ${resident.user?.email || '-'}\nTelepon: ${resident.user?.phone || '-'}\nKamar: ${resident.room?.room_number || 'Belum ada'}\nStatus: ${resident.status}\nNIM: ${resident.student_id || '-'}`);
     }
 </script>
