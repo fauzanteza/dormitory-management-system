@@ -1,0 +1,223 @@
+/* auth.css */
+:root {
+    --primary-gradient: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    --success-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    --purple-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --dark-bg: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    --card-radius: 25px;
+    --transition-speed: 0.3s;
+}
+
+/* Animasi Global untuk Auth */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Body Styling - Sesuai dengan tema admin/student */
+body.auth-page {
+    background: var(--dark-bg);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    animation: pageLoad 0.6s ease-out;
+    color: #334155;
+}
+
+.auth-container {
+    animation: fadeInUp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Main Card - Sama dengan komponen di admin/student */
+.auth-card {
+    background: #ffffff;
+    border-radius: var(--card-radius);
+    box-shadow: 0 20px 60px rgba(15, 23, 42, 0.15);
+    overflow: hidden;
+    animation: scaleIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+                box-shadow 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.auth-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 30px 80px rgba(15, 23, 42, 0.2);
+}
+
+/* Role Cards - Diperbarui */
+.role-card {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    cursor: pointer;
+    transition: all var(--transition-speed) cubic-bezier(0.34, 1.56, 0.64, 1);
+    border: 3px solid transparent;
+    text-align: center;
+    animation: cardAppear 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.role-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+}
+
+.role-card.active {
+    border-color: #3b82f6;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(29, 78, 216, 0.05) 100%);
+    box-shadow: 0 10px 30px rgba(59, 130, 246, 0.2);
+}
+
+/* Role Icon - Sama dengan styling di sistem */
+.role-icon {
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 2.5rem;
+    transition: all var(--transition-speed) cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.1);
+}
+
+.role-card:hover .role-icon {
+    transform: scale(1.1) rotate(5deg);
+}
+
+.role-card.active .role-icon {
+    background: var(--primary-gradient);
+    color: white;
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+    animation: iconFloat 2s ease-in-out infinite;
+}
+
+/* Buttons - Sesuai dengan sistem */
+.btn-auth {
+    background: var(--primary-gradient);
+    border: none;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    font-weight: 500;
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    position: relative;
+    overflow: hidden;
+    font-size: 1.1rem;
+}
+
+.btn-auth::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.btn-auth:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.btn-auth:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4);
+    background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+}
+
+/* Form Controls - Sama dengan sistem */
+.auth-form-control {
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 1rem;
+}
+
+.auth-form-control:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 0.25rem rgba(59, 130, 246, 0.15);
+    animation: inputFocus 0.3s ease-out;
+}
+
+.auth-form-control:hover {
+    border-color: #94a3b8;
+}
+
+/* Loading State - Sama dengan sistem */
+.loading-spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #ffffff;
+    animation: spin 1s linear infinite;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+/* Back Link - Sama dengan nav-link styling */
+.auth-link {
+    color: #3b82f6;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+
+.auth-link::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: #3b82f6;
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.auth-link:hover {
+    color: #2563eb;
+}
+
+.auth-link:hover::after {
+    width: 100%;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .auth-card {
+        border-radius: 20px;
+        margin: 1rem;
+    }
+    
+    .role-icon {
+        width: 80px;
+        height: 80px;
+        font-size: 2rem;
+    }
+}
