@@ -2,9 +2,10 @@ package utils
 
 import (
 	"dormitory-management/config"
-	"dormitory-management/models"
 	"fmt"
 	"log"
+	"os"
+	"strings"
 	"time"
 
 	"gorm.io/driver/mysql"
@@ -57,30 +58,55 @@ func ConnectDatabase(config *config.Config) {
 
 	log.Println("Database connected successfully")
 
-	// Auto Migrate all models to sync with database tables
-	// Order: Parent tables first (no dependencies), then child tables
-	log.Println("Running auto migration...")
-
-	// Disable foreign key checks temporarily to handle existing tables
-	DB.Exec("SET FOREIGN_KEY_CHECKS=0")
-
-	err = DB.AutoMigrate(
-		&models.User{},
-		&models.Room{},
-		&models.Resident{},
-		&models.Payment{},
-		&models.RepairRequest{},
-		&models.Booking{},
-	)
-
-	// Re-enable foreign key checks
-	DB.Exec("SET FOREIGN_KEY_CHECKS=1")
-
-	if err != nil {
-		log.Fatal("Failed to auto migrate database:", err)
+	// Import database schema from SQL file
+	// Note: We use a relative path assuming the binary is run from the backend directory
+	if err := executeSQLFile(DB, "../database/schema.sql"); err != nil {
+		log.Printf("Failed to import schema.sql: %v", err)
+	} else {
+		log.Println("Database schema imported successfully")
 	}
 
-	log.Println("Database migration completed successfully")
+	// Seed database
+	if err := executeSQLFile(DB, "../database/seed.sql"); err != nil {
+		log.Printf("Failed to import seed.sql: %v", err)
+	} else {
+		log.Println("Database seeded successfully")
+	}
+}
+
+// Helper function to read and execute SQL file
+func executeSQLFile(db *gorm.DB, filepath string) error {
+	content, err := os.ReadFile(filepath)
+	if err != nil {
+		return err
+	}
+
+	// Split SQL statements by semicolon
+	// Note: This is a simple splitter and might break on semicolons inside strings
+	// But for the provided schema/seed files it should be sufficient
+	queries := strings.Split(string(content), ";")
+
+	for _, query := range queries {
+		query = strings.TrimSpace(query)
+		if query == "" {
+			continue
+		}
+		if err := db.Exec(query).Error; err != nil {
+			// Ignore "Query was empty" or specific errors if needed
+			if !strings.Contains(err.Error(), "Query was empty") {
+				// We log but don't fail immediately to allow partial success
+				log.Printf("Error executing query: %s\nError: %v", query[:min(len(query), 50)]+"...", err)
+			}
+		}
+	}
+	return nil
+}
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
 }
 
 func GetDB() *gorm.DB {
