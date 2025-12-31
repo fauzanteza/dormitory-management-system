@@ -1,192 +1,173 @@
 <!-- Admin Payments Management Page -->
 <div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h4 class="mb-1 animate__animated animate__fadeIn">Manajemen Pembayaran</h4>
-            <p class="text-muted small mb-0 animate__animated animate__fadeIn animate__delay-1s">Kelola pembayaran asrama</p>
-        </div>
-        <button class="btn btn-primary animate__animated animate__fadeIn" onclick="showAddPaymentModal()">
-            <i class="fas fa-plus me-2"></i>Tambah Pembayaran
-        </button>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h4 class="mb-1 animate__animated animate__fadeIn">
+        Manajemen Pembayaran
+      </h4>
+      <p
+        class="text-muted small mb-0 animate__animated animate__fadeIn animate__delay-1s"
+      >
+        Kelola pembayaran asrama
+      </p>
     </div>
+  </div>
 
-    <!-- Stats Cards -->
-    <div class="row g-3 mb-4">
-        <div class="col-md-3">
-            <div class="card bg-success text-white animate__animated animate__fadeInUp">
-                <div class="card-body">
-                    <h6 class="mb-1">Total Terbayar</h6>
-                    <h3 class="mb-0" id="totalPaid">Rp 0</h3>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card bg-warning text-dark animate__animated animate__fadeInUp animate__delay-1s">
-                <div class="card-body">
-                    <h6 class="mb-1">Total Pending</h6>
-                    <h3 class="mb-0" id="totalPending">Rp 0</h3>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card bg-danger text-white animate__animated animate__fadeInUp animate__delay-2s">
-                <div class="card-body">
-                    <h6 class="mb-1">Total Overdue</h6>
-                    <h3 class="mb-0" id="totalOverdue">Rp 0</h3>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card bg-info text-white animate__animated animate__fadeInUp animate__delay-3s">
-                <div class="card-body">
-                    <h6 class="mb-1">Total Bulan Ini</h6>
-                    <h3 class="mb-0" id="totalThisMonth">Rp 0</h3>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Filters -->
-    <div class="card mb-4 animate__animated animate__fadeInUp">
+  <!-- Stats Cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-3">
+      <div
+        class="card bg-success text-white animate__animated animate__fadeInUp"
+      >
         <div class="card-body">
-            <div class="row g-3">
-                <div class="col-md-3">
-                    <select class="form-select" id="filterStatus" onchange="loadPayments()">
-                        <option value="">Semua Status</option>
-                        <option value="paid">Paid</option>
-                        <option value="pending">Pending</option>
-                        <option value="overdue">Overdue</option>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <input type="month" class="form-control" id="filterMonth" onchange="loadPayments()">
-                </div>
-                <div class="col-md-6">
-                    <input type="text" class="form-control" id="searchResident" placeholder="Cari nama penghuni..."
-                        onkeyup="loadPayments()">
-                </div>
-            </div>
+          <h6 class="mb-1">Total Terbayar</h6>
+          <h3 class="mb-0" id="totalPaid">Rp 0</h3>
         </div>
+      </div>
     </div>
-
-    <!-- Payments Table -->
-    <div class="card animate__animated animate__fadeInUp animate__delay-1s">
+    <div class="col-md-3">
+      <div
+        class="card bg-warning text-dark animate__animated animate__fadeInUp animate__delay-1s"
+      >
         <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>Penghuni</th>
-                            <th>Kamar</th>
-                            <th>Bulan</th>
-                            <th>Jumlah</th>
-                            <th>Status</th>
-                            <th>Tgl Bayar</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody id="paymentsTableBody">
-                        <tr>
-                            <td colspan="7" class="text-center py-4">
-                                <div class="spinner-border text-primary"></div>
-                                <p class="mt-2 mb-0">Memuat data...</p>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+          <h6 class="mb-1">Total Pending</h6>
+          <h3 class="mb-0" id="totalPending">Rp 0</h3>
         </div>
+      </div>
     </div>
-</div>
+    <div class="col-md-3">
+      <div
+        class="card bg-danger text-white animate__animated animate__fadeInUp animate__delay-2s"
+      >
+        <div class="card-body">
+          <h6 class="mb-1">Total Overdue</h6>
+          <h3 class="mb-0" id="totalOverdue">Rp 0</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div
+        class="card bg-info text-white animate__animated animate__fadeInUp animate__delay-3s"
+      >
+        <div class="card-body">
+          <h6 class="mb-1">Total Bulan Ini</h6>
+          <h3 class="mb-0" id="totalThisMonth">Rp 0</h3>
+        </div>
+      </div>
+    </div>
+  </div>
 
-<!-- Add Payment Modal -->
-<div class="modal fade" id="paymentModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Tambah Pembayaran</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <form id="paymentForm" onsubmit="savePayment(event)">
-                <div class="modal-body">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Penghuni *</label>
-                            <select class="form-select" id="residentId" required>
-                                <option value="">Pilih Penghuni</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Bulan *</label>
-                            <input type="month" class="form-control" id="month" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Jumlah (Rp) *</label>
-                            <input type="number" class="form-control" id="amount" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Metode Pembayaran</label>
-                            <select class="form-select" id="paymentMethod">
-                                <option value="cash">Cash</option>
-                                <option value="transfer">Transfer Bank</option>
-                                <option value="qris">QRIS</option>
-                            </select>
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label">Catatan</label>
-                            <textarea class="form-control" id="notes" rows="2"></textarea>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary">Simpan</button>
-                </div>
-            </form>
+  <!-- Filters -->
+  <div class="card mb-4 animate__animated animate__fadeInUp">
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-md-3">
+          <select
+            class="form-select"
+            id="filterStatus"
+            onchange="loadPayments()"
+          >
+            <option value="">Semua Status</option>
+            <option value="paid">Paid</option>
+            <option value="pending">Pending</option>
+            <option value="overdue">Overdue</option>
+          </select>
         </div>
+        <div class="col-md-3">
+          <input
+            type="month"
+            class="form-control"
+            id="filterMonth"
+            onchange="loadPayments()"
+          />
+        </div>
+        <div class="col-md-6">
+          <input
+            type="text"
+            class="form-control"
+            id="searchResident"
+            placeholder="Cari nama penghuni..."
+            onkeyup="loadPayments()"
+          />
+        </div>
+      </div>
     </div>
+  </div>
+
+  <!-- Payments Table -->
+  <div class="card animate__animated animate__fadeInUp animate__delay-1s">
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Penghuni</th>
+              <th>Kamar</th>
+              <th>Bulan</th>
+              <th>Jumlah</th>
+              <th>Status</th>
+              <th>Tgl Bayar</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="paymentsTableBody">
+            <tr>
+              <td colspan="7" class="text-center py-4">
+                <div class="spinner-border text-primary"></div>
+                <p class="mt-2 mb-0">Memuat data...</p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
-    let paymentsData = [];
+  let paymentsData = [];
 
-    async function initPaymentsPage() {
-        try {
-            showLoading();
-            await loadPayments();
-            await loadResidents();
-        } catch (error) {
-            console.error('Error loading payments:', error);
-            alert('Gagal memuat data pembayaran: ' + error.message);
-        } finally {
-            hideLoading();
-        }
+  async function initPaymentsPage() {
+    try {
+      showLoading();
+      await loadPayments();
+      await loadResidents();
+    } catch (error) {
+      console.error('Error loading payments:', error);
+      alert('Gagal memuat data pembayaran: ' + error.message);
+    } finally {
+      hideLoading();
     }
+  }
 
-    async function loadPayments() {
-        try {
-            const status = document.getElementById('filterStatus').value;
-            const month = document.getElementById('filterMonth').value;
-            const search = document.getElementById('searchResident').value;
+  async function loadPayments() {
+    try {
+      const statusEl = document.getElementById('filterStatus');
+      const monthEl = document.getElementById('filterMonth');
+      const searchEl = document.getElementById('searchResident');
 
-            const params = {};
-            if (status) params.status = status;
-            if (month) params.month = month;
-            if (search) params.search = search;
+      const status = statusEl ? statusEl.value : '';
+      const month = monthEl ? monthEl.value : '';
+      const search = searchEl ? searchEl.value : '';
 
-            paymentsData = await window.adminDashboard.loadPayments(params);
-            displayPayments(paymentsData);
-            calculateStats(paymentsData);
-        } catch (error) {
-            throw error;
-        }
+      const params = {};
+      if (status) params.status = status;
+      if (month) params.month = month;
+      if (search) params.search = search;
+
+      paymentsData = await window.adminDashboard.loadPayments(params);
+      displayPayments(paymentsData);
+      calculateStats(paymentsData);
+    } catch (error) {
+      throw error;
     }
+  }
 
-    function displayPayments(payments) {
-        const tbody = document.getElementById('paymentsTableBody');
+  function displayPayments(payments) {
+    const tbody = document.getElementById('paymentsTableBody');
 
-        if (payments.length === 0) {
-            tbody.innerHTML = `
+    if (payments.length === 0) {
+      tbody.innerHTML = `
                 <tr class="animate__animated animate__fadeIn">
                     <td colspan="7" class="text-center py-4 text-muted">
                         <i class="fas fa-money-bill-wave fa-3x mb-3"></i>
@@ -194,148 +175,192 @@
                     </td>
                 </tr>
             `;
-            return;
-        }
+      return;
+    }
 
-        tbody.innerHTML = payments.map((p, index) => `
-        <tr class="animate__animated animate__fadeIn" style="animation-delay: ${index * 0.1}s">
+    tbody.innerHTML = payments
+      .map(
+        (p, index) => `
+        <tr class="animate__animated animate__fadeIn" style="animation-delay: ${
+          index * 0.1
+        }s">
             <td><strong>${p.resident?.user?.name || '-'}</strong></td>
             <td>${p.room?.room_number || '-'}</td>
             <td>${formatDate(p.month)}</td>
             <td>${formatCurrency(p.amount)}</td>
-            <td><span class="badge ${getStatusBadge(p.status)}">${p.status}</span></td>
+            <td><span class="badge ${getStatusBadge(p.status)}">${
+          p.status
+        }</span></td>
             <td>${p.payment_date ? formatDate(p.payment_date) : '-'}</td>
             <td>
-                <div class="btn-group btn-group-sm" role="group">
-                    ${p.status === 'pending' ? `
+                <div class="d-flex gap-2" role="group">
+                    ${
+                      p.status === 'pending'
+                        ? `
                         <button class="btn btn-success" onclick="markAsPaid(${p.id})" title="Tandai Lunas">
                             <i class="fas fa-check"></i>
                         </button>
-                    ` : ''}
-                    ${p.status === 'paid' ? `
+                    `
+                        : ''
+                    }
+                    ${
+                      p.status === 'paid'
+                        ? `
                         <button class="btn btn-info" onclick="viewReceipt(${p.id})" title="Lihat Bukti">
                             <i class="fas fa-receipt"></i>
                         </button>
-                    ` : ''}
-                    <button class="btn btn-warning" onclick="editPayment(${p.id})" title="Edit">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="btn btn-danger" onclick="deletePayment(${p.id})" title="Hapus">
-                        <i class="fas fa-trash"></i>
-                    </button>
+                    `
+                        : ''
+                    }
+                   
+                   
                 </div>
             </td>
         </tr>
-    `).join('');
+    `
+      )
+      .join('');
+  }
+
+  function calculateStats(payments) {
+    const stats = payments.reduce(
+      (acc, p) => {
+        if (p.status === 'paid') acc.paid += p.amount;
+        else if (p.status === 'pending') acc.pending += p.amount;
+        else if (p.status === 'overdue') acc.overdue += p.amount;
+        return acc;
+      },
+      { paid: 0, pending: 0, overdue: 0 }
+    );
+
+    document.getElementById('totalPaid').textContent = formatCurrency(
+      stats.paid
+    );
+    document.getElementById('totalPending').textContent = formatCurrency(
+      stats.pending
+    );
+    document.getElementById('totalOverdue').textContent = formatCurrency(
+      stats.overdue
+    );
+
+    const thisMonth = new Date().toISOString().slice(0, 7);
+    const thisMonthTotal = payments
+      .filter(
+        (p) => p.month && p.month.startsWith(thisMonth) && p.status === 'paid'
+      )
+      .reduce((sum, p) => sum + p.amount, 0);
+    document.getElementById('totalThisMonth').textContent =
+      formatCurrency(thisMonthTotal);
+  }
+
+  async function loadResidents() {
+    try {
+      const residents = await window.adminDashboard.loadResidents({
+        status: 'active',
+      });
+      const select = document.getElementById('residentId');
+      select.innerHTML =
+        '<option value="">Pilih Penghuni</option>' +
+        residents
+          .map(
+            (r) =>
+              `<option value="${r.id}">${r.user?.name || 'Unknown'} - Kamar ${
+                r.room?.room_number || '-'
+              }</option>`
+          )
+          .join('');
+    } catch (error) {
+      console.error('Error loading residents:', error);
     }
+  }
 
-    function calculateStats(payments) {
-        const stats = payments.reduce((acc, p) => {
-            if (p.status === 'paid') acc.paid += p.amount;
-            else if (p.status === 'pending') acc.pending += p.amount;
-            else if (p.status === 'overdue') acc.overdue += p.amount;
-            return acc;
-        }, { paid: 0, pending: 0, overdue: 0 });
+  async function savePayment(event) {
+    event.preventDefault();
 
-        document.getElementById('totalPaid').textContent = formatCurrency(stats.paid);
-        document.getElementById('totalPending').textContent = formatCurrency(stats.pending);
-        document.getElementById('totalOverdue').textContent = formatCurrency(stats.overdue);
+    const paymentData = {
+      resident_id: parseInt(document.getElementById('residentId').value),
+      month: document.getElementById('month').value,
+      amount: parseFloat(document.getElementById('amount').value),
+      payment_method: document.getElementById('paymentMethod').value,
+      notes: document.getElementById('notes').value,
+      status: 'paid', // Default status paid untuk manual entry
+    };
 
-        const thisMonth = new Date().toISOString().slice(0, 7);
-        const thisMonthTotal = payments
-            .filter(p => p.month && p.month.startsWith(thisMonth) && p.status === 'paid')
-            .reduce((sum, p) => sum + p.amount, 0);
-        document.getElementById('totalThisMonth').textContent = formatCurrency(thisMonthTotal);
+    try {
+      showLoading();
+      await window.adminDashboard.createPayment(paymentData);
+      alert('Pembayaran berhasil ditambahkan!');
+      bootstrap.Modal.getInstance(
+        document.getElementById('paymentModal')
+      ).hide();
+      await loadPayments();
+    } catch (error) {
+      alert('Error: ' + error.message);
+    } finally {
+      hideLoading();
     }
+  }
 
-    async function loadResidents() {
-        try {
-            const residents = await window.adminDashboard.loadResidents({ status: 'active' });
-            const select = document.getElementById('residentId');
-            select.innerHTML = '<option value="">Pilih Penghuni</option>' +
-                residents.map(r => `<option value="${r.id}">${r.user?.name || 'Unknown'} - Kamar ${r.room?.room_number || '-'}</option>`).join('');
-        } catch (error) {
-            console.error('Error loading residents:', error);
-        }
+  async function markAsPaid(id) {
+    if (!confirm('Tandai pembayaran ini sebagai lunas?')) return;
+
+    try {
+      showLoading();
+      await window.adminDashboard.updatePaymentStatus(
+        id,
+        'paid',
+        new Date().toISOString().split('T')[0]
+      );
+      alert('Pembayaran berhasil ditandai lunas!');
+      await loadPayments();
+    } catch (error) {
+      alert('Error: ' + error.message);
+    } finally {
+      hideLoading();
     }
+  }
 
-    function showAddPaymentModal() {
-        document.getElementById('paymentForm').reset();
-        // Set bulan default ke bulan ini
-        const now = new Date();
-        const month = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
-        document.getElementById('month').value = month;
-        
-        new bootstrap.Modal(document.getElementById('paymentModal')).show();
+  function editPayment(id) {
+    const payment = paymentsData.find((p) => p.id === id);
+    if (!payment) return;
+
+    alert('Fitur edit pembayaran akan segera tersedia.');
+    // TODO: Implement edit payment modal
+  }
+
+  /* async function deletePayment(id) {
+    if (!confirm('Apakah Anda yakin ingin menghapus pembayaran ini?')) return;
+
+    try {
+      showLoading();
+      await window.adminDashboard.deletePayment(id);
+      alert('Pembayaran berhasil dihapus!');
+      await loadPayments();
+    } catch (error) {
+      alert('Error: ' + error.message);
+    } finally {
+      hideLoading();
     }
+  } */
 
-    async function savePayment(event) {
-        event.preventDefault();
+  function viewReceipt(id) {
+    const payment = paymentsData.find((p) => p.id === id);
+    if (!payment) return;
 
-        const paymentData = {
-            resident_id: parseInt(document.getElementById('residentId').value),
-            month: document.getElementById('month').value,
-            amount: parseFloat(document.getElementById('amount').value),
-            payment_method: document.getElementById('paymentMethod').value,
-            notes: document.getElementById('notes').value,
-            status: 'paid' // Default status paid untuk manual entry
-        };
+    alert(
+      `Detail Pembayaran\n\nPenghuni: ${
+        payment.resident?.user?.name || '-'
+      }\nKamar: ${payment.room?.room_number || '-'}\nBulan: ${formatDate(
+        payment.month
+      )}\nJumlah: ${formatCurrency(payment.amount)}\nStatus: ${
+        payment.status
+      }\nTanggal Bayar: ${
+        payment.payment_date ? formatDate(payment.payment_date) : '-'
+      }\nMetode: ${payment.payment_method || '-'}\nCatatan: ${
+        payment.notes || '-'
+      }`
+    );
+  }
 
-        try {
-            showLoading();
-            await window.adminDashboard.createPayment(paymentData);
-            alert('Pembayaran berhasil ditambahkan!');
-            bootstrap.Modal.getInstance(document.getElementById('paymentModal')).hide();
-            await loadPayments();
-        } catch (error) {
-            alert('Error: ' + error.message);
-        } finally {
-            hideLoading();
-        }
-    }
-
-    async function markAsPaid(id) {
-        if (!confirm('Tandai pembayaran ini sebagai lunas?')) return;
-
-        try {
-            showLoading();
-            await window.adminDashboard.updatePaymentStatus(id, 'paid', new Date().toISOString().split('T')[0]);
-            alert('Pembayaran berhasil ditandai lunas!');
-            await loadPayments();
-        } catch (error) {
-            alert('Error: ' + error.message);
-        } finally {
-            hideLoading();
-        }
-    }
-
-    function editPayment(id) {
-        const payment = paymentsData.find(p => p.id === id);
-        if (!payment) return;
-
-        alert('Fitur edit pembayaran akan segera tersedia.');
-        // TODO: Implement edit payment modal
-    }
-
-    async function deletePayment(id) {
-        if (!confirm('Apakah Anda yakin ingin menghapus pembayaran ini?')) return;
-
-        try {
-            showLoading();
-            await window.adminDashboard.deletePayment(id);
-            alert('Pembayaran berhasil dihapus!');
-            await loadPayments();
-        } catch (error) {
-            alert('Error: ' + error.message);
-        } finally {
-            hideLoading();
-        }
-    }
-
-    function viewReceipt(id) {
-        const payment = paymentsData.find(p => p.id === id);
-        if (!payment) return;
-
-        alert(`Detail Pembayaran\n\nPenghuni: ${payment.resident?.user?.name || '-'}\nKamar: ${payment.room?.room_number || '-'}\nBulan: ${formatDate(payment.month)}\nJumlah: ${formatCurrency(payment.amount)}\nStatus: ${payment.status}\nTanggal Bayar: ${payment.payment_date ? formatDate(payment.payment_date) : '-'}\nMetode: ${payment.payment_method || '-'}\nCatatan: ${payment.notes || '-'}`);
-    }
+  document.addEventListener('DOMContentLoaded', initPaymentsPage);
 </script>

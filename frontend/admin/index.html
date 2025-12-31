@@ -1,116 +1,142 @@
 <!DOCTYPE html>
 <html lang="id" class="admin">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin Panel - Sistem Asrama</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="../common/css/admin.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
-</head>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../common/css/admin.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    />
+  </head>
 
-<body class="admin">
+  <body class="admin">
     <!-- Loading Overlay -->
-    <div class="loading-overlay" style="display: none;">
-        <div class="loading-spinner"></div>
+    <div class="loading-overlay" style="display: none">
+      <div class="loading-spinner"></div>
     </div>
 
     <!-- Admin Navigation -->
     <nav class="navbar navbar-dark bg-dark fixed-top">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">
-                <i class="fas fa-university me-2"></i>
-                <span class="fw-bold">Sistem Asrama - Admin Panel</span>
-            </a>
-            <div class="d-flex align-items-center">
-                <div class="dropdown">
-                    <button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                        <i class="fas fa-user-cog me-2"></i>
-                        <span id="adminName">Administrator</span>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="#" onclick="loadPage('profile')">
-                                <i class="fas fa-user me-2"></i>Profil
-                            </a></li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
-                        <li><a class="dropdown-item text-danger" href="#" onclick="logout()">
-                                <i class="fas fa-sign-out-alt me-2"></i>Logout
-                            </a></li>
-                    </ul>
-                </div>
-            </div>
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">
+          <i class="fas fa-university me-2"></i>
+          <span class="fw-bold">Sistem Asrama - Admin Panel</span>
+        </a>
+        <div class="d-flex align-items-center">
+          <div class="dropdown">
+            <button
+              class="btn btn-outline-light dropdown-toggle"
+              type="button"
+              data-bs-toggle="dropdown"
+            >
+              <i class="fas fa-user-cog me-2"></i>
+              <span id="adminName">Administrator</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li>
+                <a class="dropdown-item" href="#" onclick="loadPage('profile')">
+                  <i class="fas fa-user me-2"></i>Profil
+                </a>
+              </li>
+              <li>
+                <hr class="dropdown-divider" />
+              </li>
+              <li>
+                <a
+                  class="dropdown-item text-danger"
+                  href="#"
+                  onclick="logout()"
+                >
+                  <i class="fas fa-sign-out-alt me-2"></i>Logout
+                </a>
+              </li>
+            </ul>
+          </div>
         </div>
+      </div>
     </nav>
 
     <!-- Admin Sidebar -->
     <div class="container-fluid">
-        <div class="row">
-            <nav id="sidebarMenu" class="col-md-3 col-lg-2 sidebar">
-                <div class="position-sticky pt-3">
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link active" href="#" data-page="dashboard">
-                                <i class="fas fa-tachometer-alt"></i>Dashboard
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#" data-page="rooms">
-                                <i class="fas fa-bed"></i>Manajemen Kamar
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#" data-page="bookings">
-                                <i class="fas fa-calendar-check"></i>Pemesanan Kamar
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#" data-page="residents">
-                                <i class="fas fa-users"></i>Data Penghuni
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#" data-page="payments">
-                                <i class="fas fa-money-bill-wave"></i>Pembayaran
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#" data-page="repairs">
-                                <i class="fas fa-tools"></i>Perbaikan
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#" data-page="users">
-                                <i class="fas fa-user-cog"></i>Manajemen User
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </nav>
+      <div class="row">
+        <nav id="sidebarMenu" class="col-md-3 col-lg-2 sidebar">
+          <div class="position-sticky pt-3">
+            <ul class="nav flex-column">
+              <li class="nav-item">
+                <a class="nav-link active" href="#" data-page="dashboard">
+                  <i class="fas fa-tachometer-alt"></i>Dashboard
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#" data-page="rooms">
+                  <i class="fas fa-bed"></i>Manajemen Kamar
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#" data-page="bookings">
+                  <i class="fas fa-calendar-check"></i>Pemesanan Kamar
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#" data-page="residents">
+                  <i class="fas fa-users"></i>Data Penghuni
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#" data-page="payments">
+                  <i class="fas fa-money-bill-wave"></i>Pembayaran
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#" data-page="repairs">
+                  <i class="fas fa-tools"></i>Perbaikan
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#" data-page="users">
+                  <i class="fas fa-user-cog"></i>Manajemen User
+                </a>
+              </li>
+            </ul>
+          </div>
+        </nav>
 
-            <!-- Main Content Area -->
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h1 class="h2" id="pageTitle">Dashboard Admin</h1>
-                    <div class="btn-toolbar mb-2 mb-md-0">
-                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="refreshData()">
-                            <i class="fas fa-sync-alt"></i> Refresh
-                        </button>
-                    </div>
-                </div>
+        <!-- Main Content Area -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+          <div
+            class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
+          >
+            <h1 class="h2" id="pageTitle">Dashboard Admin</h1>
+            <div class="btn-toolbar mb-2 mb-md-0">
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-secondary"
+                onclick="refreshData()"
+              >
+                <i class="fas fa-sync-alt"></i> Refresh
+              </button>
+            </div>
+          </div>
 
-                <!-- Dynamic Content Container -->
-                <div id="contentContainer">
-                    <div class="text-center py-5">
-                        <div class="spinner-border text-primary" role="status"></div>
-                        <p class="mt-2">Memuat dashboard...</p>
-                    </div>
-                </div>
-            </main>
-        </div>
+          <!-- Dynamic Content Container -->
+          <div id="contentContainer">
+            <div class="text-center py-5">
+              <div class="spinner-border text-primary" role="status"></div>
+              <p class="mt-2">Memuat dashboard...</p>
+            </div>
+          </div>
+        </main>
+      </div>
     </div>
 
     <!-- Scripts -->
@@ -118,154 +144,159 @@
     <script src="../common/js/auth.js"></script>
     <script src="js/admin-app.js"></script>
     <script>
-        // Utility functions
-        function formatDate(dateString) {
-            if (!dateString) return '-';
-            const date = new Date(dateString);
-            return date.toLocaleDateString('id-ID', {
-                day: '2-digit',
-                month: 'short',
-                year: 'numeric'
-            });
-        }
-
-        function formatCurrency(amount) {
-            if (!amount) return 'Rp 0';
-            return 'Rp ' + amount.toLocaleString('id-ID');
-        }
-
-        function getStatusBadge(status) {
-            const badges = {
-                'available': 'bg-success',
-                'occupied': 'bg-primary',
-                'maintenance': 'bg-warning',
-                'active': 'bg-success',
-                'inactive': 'bg-secondary',
-                'graduated': 'bg-info',
-                'pending': 'bg-warning',
-                'approved': 'bg-success',
-                'rejected': 'bg-danger',
-                'in_progress': 'bg-info',
-                'completed': 'bg-success',
-                'paid': 'bg-success',
-                'overdue': 'bg-danger'
-            };
-            return badges[status] || 'bg-secondary';
-        }
-
-        function showLoading() {
-            document.querySelector('.loading-overlay').style.display = 'flex';
-        }
-
-        function hideLoading() {
-            document.querySelector('.loading-overlay').style.display = 'none';
-        }
-
-        // Initialize Admin App
-        document.addEventListener('DOMContentLoaded', function () {
-            // Check if user is admin
-            if (!window.auth || !window.auth.isAuthenticated()) {
-                window.location.href = '/login?role=admin';
-                return;
-            }
-
-            if (window.auth.user.role !== 'admin') {
-                alert('Akses ditolak. Anda bukan administrator.');
-                window.location.href = '/student';
-                return;
-            }
-
-            // Update admin name in navbar
-            document.getElementById('adminName').textContent = window.auth.user.name;
-
-            // Load dashboard initially
-            loadPage('dashboard');
-
-            // Setup navigation
-            document.querySelectorAll('[data-page]').forEach(link => {
-                link.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    const page = this.getAttribute('data-page');
-                    loadPage(page);
-
-                    // Update active state
-                    document.querySelectorAll('.nav-link').forEach(nav => {
-                        nav.classList.remove('active');
-                    });
-                    this.classList.add('active');
-                });
-            });
+      // Utility functions
+      function formatDate(dateString) {
+        if (!dateString) return '-';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('id-ID', {
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric',
         });
+      }
 
-        function loadPage(page) {
-            const container = document.getElementById('contentContainer');
-            const title = document.getElementById('pageTitle');
+      function formatCurrency(amount) {
+        if (!amount) return 'Rp 0';
+        return 'Rp ' + amount.toLocaleString('id-ID');
+      }
 
-            // Set page title
-            const pageTitles = {
-                'dashboard': 'Dashboard Admin',
-                'rooms': 'Manajemen Kamar',
-                'bookings': 'Pemesanan Kamar',
-                'residents': 'Data Penghuni',
-                'payments': 'Pembayaran',
-                'repairs': 'Perbaikan',
-                'users': 'Manajemen User',
-                'profile': 'Profil Admin'
-            };
-            title.textContent = pageTitles[page] || 'Admin Panel';
+      function getStatusBadge(status) {
+        const badges = {
+          available: 'bg-success',
+          occupied: 'bg-primary',
+          maintenance: 'bg-warning',
+          active: 'bg-success',
+          inactive: 'bg-secondary',
+          graduated: 'bg-info',
+          pending: 'bg-warning',
+          approved: 'bg-success',
+          rejected: 'bg-danger',
+          in_progress: 'bg-info',
+          completed: 'bg-success',
+          paid: 'bg-success',
+          overdue: 'bg-danger',
+        };
+        return badges[status] || 'bg-secondary';
+      }
 
-            // Show loading
-            container.innerHTML = `
+      function showLoading() {
+        document.querySelector('.loading-overlay').style.display = 'flex';
+      }
+
+      function hideLoading() {
+        document.querySelector('.loading-overlay').style.display = 'none';
+      }
+
+      // Initialize Admin App
+      document.addEventListener('DOMContentLoaded', function () {
+        // Check if user is admin
+        if (!window.auth || !window.auth.isAuthenticated()) {
+          window.location.href = '/login?role=admin';
+          return;
+        }
+
+        if (window.auth.user.role !== 'admin') {
+          alert('Akses ditolak. Anda bukan administrator.');
+          window.location.href = '/student';
+          return;
+        }
+
+        // Update admin name in navbar
+        document.getElementById('adminName').textContent =
+          window.auth.user.name;
+
+        // Load dashboard initially
+        loadPage('dashboard');
+
+        // Setup navigation
+        document.querySelectorAll('[data-page]').forEach((link) => {
+          link.addEventListener('click', function (e) {
+            e.preventDefault();
+            const page = this.getAttribute('data-page');
+            loadPage(page);
+
+            // Update active state
+            document.querySelectorAll('.nav-link').forEach((nav) => {
+              nav.classList.remove('active');
+            });
+            this.classList.add('active');
+          });
+        });
+      });
+
+      function loadPage(page) {
+        const container = document.getElementById('contentContainer');
+        const title = document.getElementById('pageTitle');
+
+        // Set page title
+        const pageTitles = {
+          dashboard: 'Dashboard Admin',
+          rooms: 'Manajemen Kamar',
+          bookings: 'Pemesanan Kamar',
+          residents: 'Data Penghuni',
+          payments: 'Pembayaran',
+          repairs: 'Perbaikan',
+          users: 'Manajemen User',
+          profile: 'Profil Admin',
+        };
+        title.textContent = pageTitles[page] || 'Admin Panel';
+
+        // Show loading
+        container.innerHTML = `
                 <div class="text-center py-5">
                     <div class="spinner-border text-primary" role="status"></div>
                     <p class="mt-2">Memuat halaman...</p>
                 </div>
             `;
 
-            // Load page content with animation
-            setTimeout(async () => {
-                try {
-                    // Add timestamp to prevent caching during development
-                    const response = await fetch(`pages/${page}.html?t=${new Date().getTime()}`);
-                    
-                    if (!response.ok) {
-                        throw new Error('Page not found');
-                    }
-                    
-                    const html = await response.text();
-                    container.innerHTML = html;
+        // Load page content with animation
+        setTimeout(async () => {
+          try {
+            // Add timestamp to prevent caching during development
+            const response = await fetch(
+              `pages/${page}.html?t=${new Date().getTime()}`
+            );
 
-                    // Add fade-in animation to content
-                    container.style.opacity = '0';
-                    container.style.transform = 'translateY(20px)';
-                    container.style.transition = 'all 0.3s ease';
-                    
-                    setTimeout(() => {
-                        container.style.opacity = '1';
-                        container.style.transform = 'translateY(0)';
-                    }, 50);
+            if (!response.ok) {
+              throw new Error('Page not found');
+            }
 
-                    // Execute scripts found in the loaded content
-                    const scripts = container.getElementsByTagName("script");
-                    for (let i = 0; i < scripts.length; i++) {
-                        const script = document.createElement("script");
-                        if (scripts[i].src) {
-                            script.src = scripts[i].src;
-                        } else {
-                            script.text = scripts[i].text;
-                        }
-                        document.body.appendChild(script);
-                    }
+            const html = await response.text();
+            container.innerHTML = html;
 
-                    // Initialize page-specific scripts
-                    setTimeout(() => {
-                        const initFunctionName = `init${page.charAt(0).toUpperCase() + page.slice(1)}Page`;
-                        if (typeof window[initFunctionName] === 'function') {
-                            window[initFunctionName]();
-                        }
-                    }, 100);
-                } catch (error) {
-                    container.innerHTML = `
+            // Add fade-in animation to content
+            container.style.opacity = '0';
+            container.style.transform = 'translateY(20px)';
+            container.style.transition = 'all 0.3s ease';
+
+            setTimeout(() => {
+              container.style.opacity = '1';
+              container.style.transform = 'translateY(0)';
+            }, 50);
+
+            // Execute scripts found in the loaded content
+            const scripts = container.getElementsByTagName('script');
+            for (let i = 0; i < scripts.length; i++) {
+              const script = document.createElement('script');
+              if (scripts[i].src) {
+                script.src = scripts[i].src;
+              } else {
+                script.text = scripts[i].text;
+              }
+              document.body.appendChild(script);
+            }
+
+            // Initialize page-specific scripts
+            setTimeout(() => {
+              const initFunctionName = `init${
+                page.charAt(0).toUpperCase() + page.slice(1)
+              }Page`;
+              if (typeof window[initFunctionName] === 'function') {
+                window[initFunctionName]();
+              }
+            }, 100);
+          } catch (error) {
+            container.innerHTML = `
                         <div class="alert alert-warning animate__animated animate__fadeIn">
                             <h5><i class="fas fa-exclamation-triangle me-2"></i>Halaman Belum Tersedia</h5>
                             <p>Halaman "${page}" sedang dalam pengembangan.</p>
@@ -274,22 +305,95 @@
                             </button>
                         </div>
                     `;
-                    console.error('Error loading page:', error);
-                }
-            }, 300);
+            console.error('Error loading page:', error);
+          }
+        }, 300);
+      }
+
+      function refreshData() {
+        const currentPage =
+          document
+            .querySelector('.nav-link.active')
+            ?.getAttribute('data-page') || 'dashboard';
+        loadPage(currentPage);
+      }
+
+      function logout() {
+        if (confirm('Apakah Anda yakin ingin logout?')) {
+          window.auth.logout();
+        }
+      }
+
+      let userDetailModal;
+
+      function viewUser(id) {
+        const user = usersData.find((u) => u.id === id);
+        if (!user) return;
+
+        document.getElementById('detailName').textContent = user.name;
+        document.getElementById('detailEmail').textContent = user.email;
+
+        const modalEl = document.getElementById('userDetailModal');
+
+        if (!userDetailModal) {
+          userDetailModal = new bootstrap.Modal(modalEl);
         }
 
-        function refreshData() {
-            const currentPage = document.querySelector('.nav-link.active')?.getAttribute('data-page') || 'dashboard';
-            loadPage(currentPage);
-        }
-
-        function logout() {
-            if (confirm('Apakah Anda yakin ingin logout?')) {
-                window.auth.logout();
-            }
-        }
+        userDetailModal.show();
+      }
     </script>
-</body>
-
+    <!-- User Detail Modal -->
+    <div class="modal fade" id="userDetailModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Detail User</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div class="text-center mb-4">
+              <div class="avatar-admin">
+                <i class="fas fa-user fa-2x"></i>
+              </div>
+            </div>
+            <div class="list-group list-group-flush">
+              <div class="list-group-item">
+                <strong>Nama:</strong> <span id="detailName">-</span>
+              </div>
+              <div class="list-group-item">
+                <strong>Email:</strong> <span id="detailEmail">-</span>
+              </div>
+              <div class="list-group-item">
+                <strong>Telepon:</strong> <span id="detailPhone">-</span>
+              </div>
+              <div class="list-group-item">
+                <strong>Role:</strong>
+                <span id="detailRole" class="badge bg-primary">-</span>
+              </div>
+              <div class="list-group-item">
+                <strong>Bergabung:</strong> <span id="detailCreated">-</span>
+              </div>
+              <div class="list-group-item">
+                <strong>Status:</strong>
+                <span id="detailStatus" class="badge bg-success">-</span>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Tutup
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
 </html>

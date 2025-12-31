@@ -2,9 +2,9 @@ USE dormitory_management;
 -- Insert admin user (password: admin123)
 INSERT IGNORE INTO users (name, email, password, role, phone)
 VALUES (
-        'fauzan',
-        'fauzan@example.com',
-        '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBoSLP4HGdKjYW',
+        'admin',
+        'admin@example.com',
+        '$2a$10$Pnb9oOtH2N463.QjYdbgkOdNohr1ExNiqVQMbJCdvYFyaGMEo/Y.i',
         'admin',
         '081234567890'
     ),

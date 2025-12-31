@@ -1,77 +1,92 @@
 <!-- Student Repairs Page -->
 <div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h4 class="mb-0"><i class="fas fa-tools me-2"></i>Laporan Perbaikan</h4>
-        <button class="btn btn-success" onclick="showAddRepairModal()">
-            <i class="fas fa-plus me-2"></i>Laporkan Kerusakan
-        </button>
-    </div>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0"><i class="fas fa-tools me-2"></i>Laporan Perbaikan</h4>
+    <button class="btn btn-success" onclick="showAddRepairModal()">
+      <i class="fas fa-plus me-2"></i>Laporkan Kerusakan
+    </button>
+  </div>
 
-    <!-- Repairs List -->
-    <div class="row" id="repairsContainer">
-        <div class="col-12 text-center py-5">
-            <div class="spinner-border text-success"></div>
-            <p class="mt-2">Memuat data...</p>
-        </div>
+  <!-- Repairs List -->
+  <div class="row" id="repairsContainer">
+    <div class="col-12 text-center py-5">
+      <div class="spinner-border text-success"></div>
+      <p class="mt-2">Memuat data...</p>
     </div>
+  </div>
 </div>
 
 <!-- Add Repair Modal -->
 <div class="modal fade" id="repairModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header bg-success text-white">
-                <h5 class="modal-title">Laporkan Kerusakan</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <form id="repairForm" onsubmit="saveRepair(event)">
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">Judul *</label>
-                        <input type="text" class="form-control" id="title" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Deskripsi Kerusakan *</label>
-                        <textarea class="form-control" id="description" rows="4" required></textarea>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Prioritas *</label>
-                        <select class="form-select" id="priority" required>
-                            <option value="low">Rendah</option>
-                            <option value="medium" selected>Sedang</option>
-                            <option value="high">Tinggi</option>
-                            <option value="urgent">Mendesak</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-success">
-                        <i class="fas fa-paper-plane me-2"></i>Kirim Laporan
-                    </button>
-                </div>
-            </form>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title">Laporkan Kerusakan</h5>
+        <button
+          type="button"
+          class="btn-close btn-close-white"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
+      <form id="repairForm" onsubmit="saveRepair(event)">
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Judul *</label>
+            <input type="text" class="form-control" id="title" required />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Deskripsi Kerusakan *</label>
+            <textarea
+              class="form-control"
+              id="description"
+              rows="4"
+              required
+            ></textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Prioritas *</label>
+            <select class="form-select" id="priority" required>
+              <option value="low">Rendah</option>
+              <option value="medium" selected>Sedang</option>
+              <option value="high">Tinggi</option>
+              <!-- <option value="urgent">Mendesak</option> -->
+            </select>
+          </div>
         </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Batal
+          </button>
+          <button type="submit" class="btn btn-success">
+            <i class="fas fa-paper-plane me-2"></i>Kirim Laporan
+          </button>
+        </div>
+      </form>
     </div>
+  </div>
 </div>
 
 <script>
-    let myRepairsData = [];
+  let myRepairsData = [];
 
-    async function initRepairsPage() {
-        await loadMyRepairs();
-    }
+  async function initRepairsPage() {
+    await loadMyRepairs();
+  }
 
-    async function loadMyRepairs() {
-        myRepairsData = await window.studentDashboard.loadMyRepairs();
-        displayMyRepairs(myRepairsData);
-    }
+  async function loadMyRepairs() {
+    myRepairsData = await window.studentDashboard.loadMyRepairs();
+    displayMyRepairs(myRepairsData);
+  }
 
-    function displayMyRepairs(repairs) {
-        const container = document.getElementById('repairsContainer');
+  function displayMyRepairs(repairs) {
+    const container = document.getElementById('repairsContainer');
 
-        if (repairs.length === 0) {
-            container.innerHTML = `
+    if (repairs.length === 0) {
+      container.innerHTML = `
             <div class="col-12 text-center py-5">
                 <i class="fas fa-tools fa-4x text-muted mb-3"></i>
                 <h5 class="text-muted">Belum ada laporan perbaikan</h5>
@@ -80,16 +95,20 @@
                 </button>
             </div>
         `;
-            return;
-        }
+      return;
+    }
 
-        container.innerHTML = repairs.map(repair => `
+    container.innerHTML = repairs
+      .map(
+        (repair) => `
         <div class="col-md-6 mb-3">
             <div class="card h-100">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-start mb-3">
                         <h6 class="mb-0">${repair.title}</h6>
-                        <span class="badge ${getStatusBadge(repair.status)}">${repair.status}</span>
+                        <span class="badge ${getStatusBadge(repair.status)}">${
+          repair.status
+        }</span>
                     </div>
                     
                     <p class="text-muted small mb-3">${repair.description}</p>
@@ -98,66 +117,80 @@
                         <div>
                             <small class="text-muted">
                                 <i class="fas fa-flag me-1"></i>
-                                <span class="badge ${getPriorityBadge(repair.priority)}">${repair.priority}</span>
+                                <span class="badge ${getPriorityBadge(
+                                  repair.priority
+                                )}">${repair.priority}</span>
                             </small>
                         </div>
                         <div>
                             <small class="text-muted">
-                                <i class="fas fa-calendar me-1"></i>${formatDate(repair.created_at)}
+                                <i class="fas fa-calendar me-1"></i>${formatDate(
+                                  repair.created_at
+                                )}
                             </small>
                         </div>
                     </div>
                     
-                    ${repair.admin_notes ? `
+                    ${
+                      repair.admin_notes
+                        ? `
                         <div class="alert alert-info py-2 px-3 mt-3 mb-0 small">
                             <strong>Catatan Admin:</strong><br>${repair.admin_notes}
                         </div>
-                    ` : ''}
+                    `
+                        : ''
+                    }
                 </div>
             </div>
         </div>
-    `).join('');
+    `
+      )
+      .join('');
+  }
+
+  function showAddRepairModal() {
+    document.getElementById('repairForm').reset();
+    new bootstrap.Modal(document.getElementById('repairModal')).show();
+  }
+
+  async function saveRepair(event) {
+    event.preventDefault();
+
+    try {
+      // Get user's room first
+      const myRoom = await window.studentDashboard.loadMyRoom();
+      if (!myRoom || !myRoom.id) {
+        alert(
+          'Anda belum terdaftar di kamar manapun. Tidak dapat membuat laporan perbaikan.'
+        );
+        return;
+      }
+
+      const repairData = {
+        room_id: myRoom.id,
+        title: document.getElementById('title').value,
+        description: document.getElementById('description').value,
+        priority: document.getElementById('priority').value,
+      };
+
+      await window.studentDashboard.createRepair(repairData);
+      alert('Laporan perbaikan berhasil dikirim!');
+      bootstrap.Modal.getInstance(
+        document.getElementById('repairModal')
+      ).hide();
+      await loadMyRepairs();
+    } catch (error) {
+      alert('Error: ' + error.message);
     }
+  }
 
-    function showAddRepairModal() {
-        document.getElementById('repairForm').reset();
-        new bootstrap.Modal(document.getElementById('repairModal')).show();
-    }
-
-    async function saveRepair(event) {
-        event.preventDefault();
-
-        try {
-            // Get user's room first
-            const myRoom = await window.studentDashboard.loadMyRoom();
-            if (!myRoom || !myRoom.id) {
-                alert('Anda belum terdaftar di kamar manapun. Tidak dapat membuat laporan perbaikan.');
-                return;
-            }
-
-            const repairData = {
-                room_id: myRoom.id,
-                title: document.getElementById('title').value,
-                description: document.getElementById('description').value,
-                priority: document.getElementById('priority').value
-            };
-
-            await window.studentDashboard.createRepair(repairData);
-            alert('Laporan perbaikan berhasil dikirim!');
-            bootstrap.Modal.getInstance(document.getElementById('repairModal')).hide();
-            await loadMyRepairs();
-        } catch (error) {
-            alert('Error: ' + error.message);
-        }
-    }
-
-    function getPriorityBadge(priority) {
-        const badges = {
-            'low': 'bg-secondary',
-            'medium': 'bg-info',
-            'high': 'bg-warning',
-            'urgent': 'bg-danger'
-        };
-        return badges[priority] || 'bg-secondary';
-    }
+  function getPriorityBadge(priority) {
+    const badges = {
+      low: 'bg-secondary',
+      medium: 'bg-info',
+      high: 'bg-warning',
+      urgent: 'bg-danger',
+    };
+    return badges[priority] || 'bg-secondary';
+  }
 </script>

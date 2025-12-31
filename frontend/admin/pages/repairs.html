@@ -1,164 +1,130 @@
 <!-- Admin Repairs Management Page -->
 <div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h4 class="mb-1 animate__animated animate__fadeIn"><i class="fas fa-tools me-2"></i>Manajemen Perbaikan</h4>
-            <p class="text-muted small mb-0 animate__animated animate__fadeIn animate__delay-1s">Kelola laporan perbaikan asrama</p>
-        </div>
-        <button class="btn btn-primary animate__animated animate__fadeIn" onclick="showAddRepairModal()">
-            <i class="fas fa-plus me-2"></i>Tambah Laporan
-        </button>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h4 class="mb-1 animate__animated animate__fadeIn">
+        <i class="fas fa-tools me-2"></i>Manajemen Perbaikan
+      </h4>
+      <p
+        class="text-muted small mb-0 animate__animated animate__fadeIn animate__delay-1s"
+      >
+        Kelola laporan perbaikan asrama
+      </p>
     </div>
+  </div>
 
-    <!-- Filters -->
-    <div class="card mb-4 animate__animated animate__fadeInUp">
-        <div class="card-body">
-            <div class="row g-3">
-                <div class="col-md-3">
-                    <select class="form-select" id="filterStatus" onchange="loadRepairs()">
-                        <option value="">Semua Status</option>
-                        <option value="pending">Pending</option>
-                        <option value="in_progress">In Progress</option>
-                        <option value="completed">Completed</option>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <select class="form-select" id="filterPriority" onchange="loadRepairs()">
-                        <option value="">Semua Prioritas</option>
-                        <option value="low">Low</option>
-                        <option value="medium">Medium</option>
-                        <option value="high">High</option>
-                        <option value="urgent">Urgent</option>
-                    </select>
-                </div>
-                <div class="col-md-6">
-                    <input type="text" class="form-control" id="searchRepair" placeholder="Cari judul atau deskripsi..."
-                        onkeyup="loadRepairs()">
-                </div>
-            </div>
+  <!-- Filters -->
+  <div class="card mb-4 animate__animated animate__fadeInUp">
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-md-3">
+          <select
+            class="form-select"
+            id="filterStatus"
+            onchange="loadRepairs()"
+          >
+            <option value="">Semua Status</option>
+            <option value="pending">Pending</option>
+            <option value="in_progress">In Progress</option>
+            <option value="completed">Completed</option>
+          </select>
         </div>
+        <div class="col-md-3">
+          <select
+            class="form-select"
+            id="filterPriority"
+            onchange="loadRepairs()"
+          >
+            <option value="">Semua Prioritas</option>
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <input
+            type="text"
+            class="form-control"
+            id="searchRepair"
+            placeholder="Cari judul atau deskripsi..."
+            onkeyup="loadRepairs()"
+          />
+        </div>
+      </div>
     </div>
+  </div>
 
-    <!-- Repairs List -->
-    <div class="row" id="repairsContainer">
-        <div class="col-12 text-center py-5">
-            <div class="spinner-border text-primary"></div>
-            <p class="mt-2 mb-0">Memuat data...</p>
-        </div>
+  <!-- Repairs List -->
+  <div class="row" id="repairsContainer">
+    <div class="col-12 text-center py-5">
+      <div class="spinner-border text-primary"></div>
+      <p class="mt-2 mb-0">Memuat data...</p>
     </div>
-</div>
-
-<!-- Add Repair Modal -->
-<div class="modal fade" id="repairModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Tambah Laporan Perbaikan</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <form id="repairForm" onsubmit="saveRepair(event)">
-                <div class="modal-body">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Judul *</label>
-                            <input type="text" class="form-control" id="repairTitle" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Prioritas *</label>
-                            <select class="form-select" id="repairPriority" required>
-                                <option value="low">Low</option>
-                                <option value="medium">Medium</option>
-                                <option value="high">High</option>
-                                <option value="urgent">Urgent</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Kamar</label>
-                            <select class="form-select" id="repairRoomId">
-                                <option value="">Pilih Kamar</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Status *</label>
-                            <select class="form-select" id="repairStatus" required>
-                                <option value="pending">Pending</option>
-                                <option value="in_progress">In Progress</option>
-                                <option value="completed">Completed</option>
-                            </select>
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label">Deskripsi *</label>
-                            <textarea class="form-control" id="repairDescription" rows="4" required></textarea>
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label">Catatan Teknisi</label>
-                            <textarea class="form-control" id="repairNotes" rows="2"></textarea>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary">Simpan</button>
-                </div>
-            </form>
-        </div>
-    </div>
+  </div>
 </div>
 
 <script>
-    let repairsData = [];
+  let repairsData = [];
 
-    async function initRepairsPage() {
-        try {
-            showLoading();
-            await loadRepairs();
-            await loadRoomsForRepairs();
-        } catch (error) {
-            console.error('Error loading repairs:', error);
-            alert('Gagal memuat data perbaikan: ' + error.message);
-        } finally {
-            hideLoading();
-        }
+  async function initRepairsPage() {
+    try {
+      showLoading();
+      await loadRepairs();
+      await loadRoomsForRepairs();
+    } catch (error) {
+      console.error('Error loading repairs:', error);
+      alert('Gagal memuat data perbaikan: ' + error.message);
+    } finally {
+      hideLoading();
     }
+  }
 
-    async function loadRepairs() {
-        try {
-            const status = document.getElementById('filterStatus').value;
-            const priority = document.getElementById('filterPriority').value;
-            const search = document.getElementById('searchRepair').value;
+  async function loadRepairs() {
+    try {
+      const status = document.getElementById('filterStatus').value;
+      const priority = document.getElementById('filterPriority').value;
+      const search = document.getElementById('searchRepair').value;
 
-            const params = {};
-            if (status) params.status = status;
-            if (priority) params.priority = priority;
-            if (search) params.search = search;
+      const params = {};
+      if (status) params.status = status;
+      if (priority) params.priority = priority;
+      if (search) params.search = search;
 
-            repairsData = await window.adminDashboard.loadRepairs(params);
-            displayRepairs(repairsData);
-        } catch (error) {
-            throw error;
-        }
+      repairsData = await window.adminDashboard.loadRepairs(params);
+      displayRepairs(repairsData);
+    } catch (error) {
+      throw error;
     }
+  }
 
-    function displayRepairs(repairs) {
-        const container = document.getElementById('repairsContainer');
+  function displayRepairs(repairs) {
+    const container = document.getElementById('repairsContainer');
 
-        if (repairs.length === 0) {
-            container.innerHTML = `
+    if (repairs.length === 0) {
+      container.innerHTML = `
                 <div class="col-12 text-center py-5 text-muted animate__animated animate__fadeIn">
                     <i class="fas fa-tools fa-3x mb-3"></i>
                     <p class="mb-0">Tidak ada data perbaikan</p>
                 </div>
             `;
-            return;
-        }
+      return;
+    }
 
-        container.innerHTML = repairs.map((r, index) => `
-        <div class="col-md-6 col-lg-4 mb-3 animate__animated animate__fadeIn" style="animation-delay: ${index * 0.1}s">
+    container.innerHTML = repairs
+      .map(
+        (r, index) => `
+        <div class="col-md-6 col-lg-4 mb-3 animate__animated animate__fadeIn" style="animation-delay: ${
+          index * 0.1
+        }s">
             <div class="card h-100">
                 <div class="card-body">
                     <div class="d-flex justify-content-between mb-2">
-                        <h6 class="mb-0 text-truncate" title="${r.title}">${r.title}</h6>
-                        <span class="badge ${getPriorityBadge(r.priority)}">${r.priority}</span>
+                        <h6 class="mb-0 text-truncate" title="${r.title}">${
+          r.title
+        }</h6>
+                        <span class="badge ${getPriorityBadge(r.priority)}">${
+          r.priority
+        }</span>
                     </div>
                     
                     <p class="text-muted small mb-2" style="max-height: 60px; overflow: hidden; text-overflow: ellipsis;">
@@ -166,123 +132,129 @@
                     </p>
                     
                     <div class="mb-2">
-                        <small><strong>Pelapor:</strong> ${r.resident?.user?.name || 'Admin'}</small><br>
-                        <small><strong>Kamar:</strong> ${r.room?.room_number || '-'}</small>
+                        <small><strong>Pelapor:</strong> ${
+                          r.resident?.user?.name || 'Admin'
+                        }</small><br>
+                        <small><strong>Kamar:</strong> ${
+                          r.room?.room_number || '-'
+                        }</small>
                     </div>
                     
                     <div class="mb-3">
-                        <span class="badge ${getStatusBadge(r.status)}">${r.status}</span>
-                        <small class="text-muted ms-2">${formatDate(r.created_at)}</small>
+                        <span class="badge ${getStatusBadge(r.status)}">${
+          r.status
+        }</span>
+                        <small class="text-muted ms-2">${formatDate(
+                          r.created_at
+                        )}</small>
                     </div>
                     
                     <div class="btn-group w-100" role="group">
-                        ${r.status !== 'completed' ? `
+                        ${
+                          r.status !== 'completed'
+                            ? `
                             <button class="btn btn-sm btn-success" onclick="updateRepairStatus(${r.id}, 'in_progress')" title="Tandai Proses">
                                 <i class="fas fa-play"></i>
                             </button>
                             <button class="btn btn-sm btn-primary" onclick="updateRepairStatus(${r.id}, 'completed')" title="Selesai">
                                 <i class="fas fa-check"></i>
                             </button>
-                        ` : ''}
-                        <button class="btn btn-sm btn-info" onclick="viewRepair(${r.id})" title="Detail">
+                        `
+                            : ''
+                        }
+                        <button class="btn btn-sm btn-info" onclick="viewRepair(${
+                          r.id
+                        })" title="Detail">
                             <i class="fas fa-eye"></i>
                         </button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteRepair(${r.id})" title="Hapus">
-                            <i class="fas fa-trash"></i>
-                        </button>
+                       
                     </div>
                 </div>
             </div>
         </div>
-    `).join('');
+    `
+      )
+      .join('');
+  }
+
+  async function loadRoomsForRepairs() {
+    try {
+      const rooms = await window.adminDashboard.loadRooms();
+      const roomSelect = document.getElementById('repairRoomId');
+      roomSelect.innerHTML =
+        '<option value="">Pilih Kamar</option>' +
+        rooms
+          .map((r) => `<option value="${r.id}">Kamar ${r.room_number}</option>`)
+          .join('');
+    } catch (error) {
+      console.error('Error loading rooms:', error);
     }
+  }
 
-    async function loadRoomsForRepairs() {
-        try {
-            const rooms = await window.adminDashboard.loadRooms();
-            const roomSelect = document.getElementById('repairRoomId');
-            roomSelect.innerHTML = '<option value="">Pilih Kamar</option>' +
-                rooms.map(r => `<option value="${r.id}">Kamar ${r.room_number}</option>`).join('');
-        } catch (error) {
-            console.error('Error loading rooms:', error);
-        }
+  async function saveRepair(event) {
+    event.preventDefault();
+
+    const repairData = {
+      title: document.getElementById('repairTitle').value,
+      description: document.getElementById('repairDescription').value,
+      priority: document.getElementById('repairPriority').value,
+      status: document.getElementById('repairStatus').value,
+      room_id: document.getElementById('repairRoomId').value || null,
+      notes: document.getElementById('repairNotes').value,
+      reported_by: 'admin', // Ditambahkan oleh admin
+    };
+
+    try {
+      showLoading();
+      await window.adminDashboard.createRepair(repairData);
+      alert('Laporan perbaikan berhasil ditambahkan!');
+      bootstrap.Modal.getInstance(
+        document.getElementById('repairModal')
+      ).hide();
+      await loadRepairs();
+    } catch (error) {
+      alert('Error: ' + error.message);
+    } finally {
+      hideLoading();
     }
+  }
 
-    function showAddRepairModal() {
-        document.getElementById('repairForm').reset();
-        new bootstrap.Modal(document.getElementById('repairModal')).show();
+  async function updateRepairStatus(id, status) {
+    if (!confirm(`Ubah status perbaikan menjadi "${status}"?`)) return;
+
+    try {
+      showLoading();
+      await window.adminDashboard.updateRepairStatus(id, status);
+      alert('Status perbaikan berhasil diupdate!');
+      await loadRepairs();
+    } catch (error) {
+      alert('Error: ' + error.message);
+    } finally {
+      hideLoading();
     }
+  }
 
-    async function saveRepair(event) {
-        event.preventDefault();
+  function viewRepair(id) {
+    const repair = repairsData.find((r) => r.id === id);
+    if (!repair) return;
 
-        const repairData = {
-            title: document.getElementById('repairTitle').value,
-            description: document.getElementById('repairDescription').value,
-            priority: document.getElementById('repairPriority').value,
-            status: document.getElementById('repairStatus').value,
-            room_id: document.getElementById('repairRoomId').value || null,
-            notes: document.getElementById('repairNotes').value,
-            reported_by: 'admin' // Ditambahkan oleh admin
-        };
+    alert(
+      `Detail Perbaikan\n\nJudul: ${repair.title}\nDeskripsi: ${
+        repair.description
+      }\nPrioritas: ${repair.priority}\nStatus: ${repair.status}\nPelapor: ${
+        repair.resident?.user?.name || 'Admin'
+      }\nKamar: ${repair.room?.room_number || '-'}\nCatatan: ${
+        repair.notes || '-'
+      }\nDibuat: ${formatDate(repair.created_at)}`
+    );
+  }
 
-        try {
-            showLoading();
-            await window.adminDashboard.createRepair(repairData);
-            alert('Laporan perbaikan berhasil ditambahkan!');
-            bootstrap.Modal.getInstance(document.getElementById('repairModal')).hide();
-            await loadRepairs();
-        } catch (error) {
-            alert('Error: ' + error.message);
-        } finally {
-            hideLoading();
-        }
-    }
-
-    async function updateRepairStatus(id, status) {
-        if (!confirm(`Ubah status perbaikan menjadi "${status}"?`)) return;
-
-        try {
-            showLoading();
-            await window.adminDashboard.updateRepairStatus(id, status);
-            alert('Status perbaikan berhasil diupdate!');
-            await loadRepairs();
-        } catch (error) {
-            alert('Error: ' + error.message);
-        } finally {
-            hideLoading();
-        }
-    }
-
-    async function deleteRepair(id) {
-        if (!confirm('Apakah Anda yakin ingin menghapus laporan perbaikan ini?')) return;
-
-        try {
-            showLoading();
-            await window.adminDashboard.deleteRepair(id);
-            alert('Laporan perbaikan berhasil dihapus!');
-            await loadRepairs();
-        } catch (error) {
-            alert('Error: ' + error.message);
-        } finally {
-            hideLoading();
-        }
-    }
-
-    function viewRepair(id) {
-        const repair = repairsData.find(r => r.id === id);
-        if (!repair) return;
-
-        alert(`Detail Perbaikan\n\nJudul: ${repair.title}\nDeskripsi: ${repair.description}\nPrioritas: ${repair.priority}\nStatus: ${repair.status}\nPelapor: ${repair.resident?.user?.name || 'Admin'}\nKamar: ${repair.room?.room_number || '-'}\nCatatan: ${repair.notes || '-'}\nDibuat: ${formatDate(repair.created_at)}`);
-    }
-
-    function getPriorityBadge(priority) {
-        const badges = {
-            'low': 'bg-secondary',
-            'medium': 'bg-info',
-            'high': 'bg-warning',
-            'urgent': 'bg-danger'
-        };
-        return badges[priority] || 'bg-secondary';
-    }
+  function getPriorityBadge(priority) {
+    const badges = {
+      low: 'bg-secondary',
+      medium: 'bg-info',
+      high: 'bg-warning',
+    };
+    return badges[priority] || 'bg-secondary';
+  }
 </script>

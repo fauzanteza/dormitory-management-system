@@ -1,178 +1,126 @@
 <!-- Admin Rooms Management Page -->
 <div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h4 class="mb-1 animate__animated animate__fadeIn">Manajemen Kamar</h4>
-            <p class="text-muted small mb-0 animate__animated animate__fadeIn animate__delay-1s">Kelola semua kamar asrama</p>
-        </div>
-        <button class="btn btn-primary animate__animated animate__fadeIn" onclick="showAddRoomModal()">
-            <i class="fas fa-plus me-2"></i>Tambah Kamar
-        </button>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h4 class="mb-1 animate__animated animate__fadeIn">Manajemen Kamar</h4>
+      <p
+        class="text-muted small mb-0 animate__animated animate__fadeIn animate__delay-1s"
+      >
+        Kelola semua kamar asrama
+      </p>
     </div>
+  </div>
 
-    <!-- Filters -->
-    <div class="card mb-4 animate__animated animate__fadeInUp">
-        <div class="card-body">
-            <div class="row g-3">
-                <div class="col-md-3">
-                    <select class="form-select" id="filterStatus" onchange="loadRooms()">
-                        <option value="">Semua Status</option>
-                        <option value="available">Available</option>
-                        <option value="occupied">Occupied</option>
-                        <option value="maintenance">Maintenance</option>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <select class="form-select" id="filterBuilding" onchange="loadRooms()">
-                        <option value="">Semua Gedung</option>
-                        <option value="A">Gedung A</option>
-                        <option value="B">Gedung B</option>
-                        <option value="C">Gedung C</option>
-                    </select>
-                </div>
-                <div class="col-md-6">
-                    <input type="text" class="form-control" id="searchRoom" placeholder="Cari nomor kamar..."
-                        onkeyup="loadRooms()">
-                </div>
-            </div>
+  <!-- Filters -->
+  <div class="card mb-4 animate__animated animate__fadeInUp">
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-md-3">
+          <select class="form-select" id="filterStatus" onchange="loadRooms()">
+            <option value="">Semua Status</option>
+            <option value="available">Available</option>
+            <option value="occupied">Occupied</option>
+            <option value="maintenance">Maintenance</option>
+          </select>
         </div>
+        <div class="col-md-3">
+          <select
+            class="form-select"
+            id="filterBuilding"
+            onchange="loadRooms()"
+          >
+            <option value="">Semua Gedung</option>
+            <option value="Gedung A">Gedung A</option>
+            <option value="Gedung B">Gedung B</option>
+            <option value="Gedung C">Gedung C</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <input
+            type="text"
+            class="form-control"
+            id="searchRoom"
+            placeholder="Cari nomor kamar..."
+            onkeyup="loadRooms()"
+          />
+        </div>
+      </div>
     </div>
+  </div>
 
-    <!-- Rooms Table -->
-    <div class="card animate__animated animate__fadeInUp animate__delay-1s">
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>No. Kamar</th>
-                            <th>Gedung</th>
-                            <th>Lantai</th>
-                            <th>Kapasitas</th>
-                            <th>Terisi</th>
-                            <th>Tarif/Bulan</th>
-                            <th>Status</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody id="roomsTableBody">
-                        <tr>
-                            <td colspan="8" class="text-center py-4">
-                                <div class="spinner-border text-primary"></div>
-                                <p class="mt-2 mb-0">Memuat data...</p>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+  <!-- Rooms Table -->
+  <div class="card animate__animated animate__fadeInUp animate__delay-1s">
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>No. Kamar</th>
+              <th>Gedung</th>
+              <th>Lantai</th>
+              <th>Kapasitas</th>
+              <th>Terisi</th>
+              <th>Tarif/Bulan</th>
+              <th>Status</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="roomsTableBody">
+            <tr>
+              <td colspan="8" class="text-center py-4">
+                <div class="spinner-border text-primary"></div>
+                <p class="mt-2 mb-0">Memuat data...</p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
-</div>
-
-<!-- Add/Edit Room Modal -->
-<div class="modal fade" id="roomModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="roomModalTitle">Tambah Kamar</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <form id="roomForm" onsubmit="saveRoom(event)">
-                <div class="modal-body">
-                    <input type="hidden" id="roomId">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Nomor Kamar *</label>
-                            <input type="text" class="form-control" id="roomNumber" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Gedung *</label>
-                            <select class="form-select" id="building" required>
-                                <option value="">Pilih Gedung</option>
-                                <option value="A">Gedung A</option>
-                                <option value="B">Gedung B</option>
-                                <option value="C">Gedung C</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Lantai *</label>
-                            <input type="number" class="form-control" id="floor" min="1" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Kapasitas *</label>
-                            <input type="number" class="form-control" id="capacity" min="1" max="4" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Tarif Bulanan (Rp) *</label>
-                            <input type="number" class="form-control" id="monthlyRate" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Status</label>
-                            <select class="form-select" id="status">
-                                <option value="available">Available</option>
-                                <option value="occupied">Occupied</option>
-                                <option value="maintenance">Maintenance</option>
-                            </select>
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label">Deskripsi</label>
-                            <textarea class="form-control" id="description" rows="3"></textarea>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save me-2"></i>Simpan
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
+  </div>
 </div>
 
 <script>
-    let roomsData = [];
+  let roomsData = [];
 
-    async function initRoomsPage() {
-        try {
-            showLoading();
-            await loadRooms();
-        } catch (error) {
-            console.error('Error loading rooms:', error);
-            alert('Gagal memuat data kamar: ' + error.message);
-        } finally {
-            hideLoading();
-        }
+  async function initRoomsPage() {
+    try {
+      showLoading();
+      await loadRooms();
+    } catch (error) {
+      console.error('Error loading rooms:', error);
+      alert('Gagal memuat data kamar: ' + error.message);
+    } finally {
+      hideLoading();
+    }
+  }
+
+  async function loadRooms() {
+    const status = document.getElementById('filterStatus').value;
+    const building = document.getElementById('filterBuilding').value;
+    const search = document.getElementById('searchRoom').value;
+
+    const params = {};
+    if (status) params.status = status;
+    if (building) params.building = building;
+
+    roomsData = await window.adminDashboard.loadRooms(params);
+
+    // Filter by search
+    let filteredRooms = roomsData;
+    if (search) {
+      filteredRooms = roomsData.filter((r) =>
+        r.room_number.toLowerCase().includes(search.toLowerCase())
+      );
     }
 
-    async function loadRooms() {
-        const status = document.getElementById('filterStatus').value;
-        const building = document.getElementById('filterBuilding').value;
-        const search = document.getElementById('searchRoom').value;
+    displayRooms(filteredRooms);
+  }
 
-        const params = {};
-        if (status) params.status = status;
-        if (building) params.building = building;
+  function displayRooms(rooms) {
+    const tbody = document.getElementById('roomsTableBody');
 
-        roomsData = await window.adminDashboard.loadRooms(params);
-
-        // Filter by search
-        let filteredRooms = roomsData;
-        if (search) {
-            filteredRooms = roomsData.filter(r =>
-                r.room_number.toLowerCase().includes(search.toLowerCase())
-            );
-        }
-
-        displayRooms(filteredRooms);
-    }
-
-    function displayRooms(rooms) {
-        const tbody = document.getElementById('roomsTableBody');
-
-        if (rooms.length === 0) {
-            tbody.innerHTML = `
+    if (rooms.length === 0) {
+      tbody.innerHTML = `
             <tr class="animate__animated animate__fadeIn">
                 <td colspan="8" class="text-center py-4 text-muted">
                     <i class="fas fa-inbox fa-3x mb-3"></i>
@@ -180,111 +128,103 @@
                 </td>
             </tr>
         `;
-            return;
-        }
+      return;
+    }
 
-        tbody.innerHTML = rooms.map((room, index) => `
-        <tr class="animate__animated animate__fadeIn" style="animation-delay: ${index * 0.1}s">
+    tbody.innerHTML = rooms
+      .map(
+        (room, index) => `
+        <tr class="animate__animated animate__fadeIn" style="animation-delay: ${
+          index * 0.1
+        }s">
             <td><strong>${room.room_number}</strong></td>
             <td>${room.building}</td>
             <td>${room.floor}</td>
             <td>${room.capacity} orang</td>
             <td>${room.current_occupancy || 0}/${room.capacity}</td>
             <td>${formatCurrency(room.monthly_rate)}</td>
-            <td><span class="badge ${getStatusBadge(room.status)}">${room.status}</span></td>
+            <td><span class="badge ${getStatusBadge(room.status)}">${
+          room.status
+        }</span></td>
             <td>
-                <div class="btn-group btn-group-sm" role="group">
-                    <button class="btn btn-info" onclick="viewRoom(${room.id})" title="Detail">
+                <div class="btn-group btn-group-sm " role="group">
+                    <button class="btn btn-info" onclick="viewRoom(${
+                      room.id
+                    })" title="Detail">
                         <i class="fas fa-eye"></i>
                     </button>
-                    <button class="btn btn-warning" onclick="editRoom(${room.id})" title="Edit">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="btn btn-danger" onclick="deleteRoom(${room.id})" title="Hapus">
+     
+                    <button class="btn btn-danger" onclick="deleteRoom(${
+                      room.id
+                    })" title="Hapus">
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>
             </td>
         </tr>
-    `).join('');
+    `
+      )
+      .join('');
+  }
+
+  async function saveRoom(event) {
+    event.preventDefault();
+
+    const id = document.getElementById('roomId').value;
+    const roomData = {
+      room_number: document.getElementById('roomNumber').value,
+      building: document.getElementById('building').value,
+      floor: parseInt(document.getElementById('floor').value),
+      capacity: parseInt(document.getElementById('capacity').value),
+      monthly_rate: parseFloat(document.getElementById('monthlyRate').value),
+      status: document.getElementById('status').value,
+      description: document.getElementById('description').value,
+    };
+
+    try {
+      showLoading();
+      if (id) {
+        await window.adminDashboard.updateRoom(id, roomData);
+        alert('Kamar berhasil diupdate!');
+      } else {
+        await window.adminDashboard.createRoom(roomData);
+        alert('Kamar berhasil ditambahkan!');
+      }
+
+      bootstrap.Modal.getInstance(document.getElementById('roomModal')).hide();
+      await loadRooms();
+    } catch (error) {
+      alert('Error: ' + error.message);
+    } finally {
+      hideLoading();
     }
+  }
 
-    function showAddRoomModal() {
-        document.getElementById('roomModalTitle').textContent = 'Tambah Kamar';
-        document.getElementById('roomForm').reset();
-        document.getElementById('roomId').value = '';
-        new bootstrap.Modal(document.getElementById('roomModal')).show();
+  async function deleteRoom(id) {
+    if (!confirm('Apakah Anda yakin ingin menghapus kamar ini?')) return;
+
+    try {
+      showLoading();
+      await window.adminDashboard.deleteRoom(id);
+      alert('Kamar berhasil dihapus!');
+      await loadRooms();
+    } catch (error) {
+      alert('Error: ' + error.message);
+    } finally {
+      hideLoading();
     }
+  }
 
-    function editRoom(id) {
-        const room = roomsData.find(r => r.id === id);
-        if (!room) return;
+  function viewRoom(id) {
+    const room = roomsData.find((r) => r.id === id);
+    if (!room) return;
 
-        document.getElementById('roomModalTitle').textContent = 'Edit Kamar';
-        document.getElementById('roomId').value = room.id;
-        document.getElementById('roomNumber').value = room.room_number;
-        document.getElementById('building').value = room.building;
-        document.getElementById('floor').value = room.floor;
-        document.getElementById('capacity').value = room.capacity;
-        document.getElementById('monthlyRate').value = room.monthly_rate;
-        document.getElementById('status').value = room.status;
-        document.getElementById('description').value = room.description || '';
-
-        new bootstrap.Modal(document.getElementById('roomModal')).show();
-    }
-
-    async function saveRoom(event) {
-        event.preventDefault();
-
-        const id = document.getElementById('roomId').value;
-        const roomData = {
-            room_number: document.getElementById('roomNumber').value,
-            building: document.getElementById('building').value,
-            floor: parseInt(document.getElementById('floor').value),
-            capacity: parseInt(document.getElementById('capacity').value),
-            monthly_rate: parseFloat(document.getElementById('monthlyRate').value),
-            status: document.getElementById('status').value,
-            description: document.getElementById('description').value
-        };
-
-        try {
-            showLoading();
-            if (id) {
-                await window.adminDashboard.updateRoom(id, roomData);
-                alert('Kamar berhasil diupdate!');
-            } else {
-                await window.adminDashboard.createRoom(roomData);
-                alert('Kamar berhasil ditambahkan!');
-            }
-
-            bootstrap.Modal.getInstance(document.getElementById('roomModal')).hide();
-            await loadRooms();
-        } catch (error) {
-            alert('Error: ' + error.message);
-        } finally {
-            hideLoading();
-        }
-    }
-
-    async function deleteRoom(id) {
-        if (!confirm('Apakah Anda yakin ingin menghapus kamar ini?')) return;
-
-        try {
-            showLoading();
-            await window.adminDashboard.deleteRoom(id);
-            alert('Kamar berhasil dihapus!');
-            await loadRooms();
-        } catch (error) {
-            alert('Error: ' + error.message);
-        } finally {
-            hideLoading();
-        }
-    }
-
-    function viewRoom(id) {
-        const room = roomsData.find(r => r.id === id);
-        if (!room) return;
-
-        alert(`Detail Kamar ${room.room_number}\n\nGedung: ${room.building}\nLantai: ${room.floor}\nKapasitas: ${room.capacity}\nTarif: ${formatCurrency(room.monthly_rate)}\nStatus: ${room.status}`);
-    }
+    alert(
+      `Detail Kamar ${room.room_number}\n\nGedung: ${room.building}\nLantai: ${
+        room.floor
+      }\nKapasitas: ${room.capacity}\nTarif: ${formatCurrency(
+        room.monthly_rate
+      )}\nStatus: ${room.status}`
+    );
+  }
 </script>

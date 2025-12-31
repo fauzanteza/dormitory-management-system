@@ -9,10 +9,12 @@ Error: `Cannot change column 'user_id'` - Tabel dibuat dengan INT, GORM butuh BI
 ### Step 1: Drop Database via phpMyAdmin
 
 1. **Buka phpMyAdmin**
+
    - URL: <http://localhost/phpmyadmin>
    - Atau dari XAMPP Control Panel → klik "Admin" pada MySQL
 
 2. **Drop Database**
+
    - Klik database **`dormitory_management`** di sidebar kiri
    - Klik tab **"Operations"** di menu atas
    - Scroll ke bawah, cari bagian **"Remove database"**

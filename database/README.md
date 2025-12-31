@@ -42,8 +42,8 @@ Server akan import seed data secara otomatis saat pertama kali jalan (jika tabel
 
 ### Admin
 
-- Email: `admin@asrama.com`
-- Password: `password123`
+- Email: `admin@example.com`
+- Password: `admin123`
 
 ### Students
 

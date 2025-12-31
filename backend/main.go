@@ -4,11 +4,13 @@ import (
 	"dormitory-management/config"
 	"dormitory-management/routes"
 	"dormitory-management/utils"
+	"fmt"
 	"log"
 	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func main() {
@@ -51,6 +53,10 @@ func main() {
 
 	// Setup routes
 	routes.SetupRoutes(router, utils.GetDB(), cfg)
+
+	password := "admin123"
+	hash, _ := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	fmt.Println(string(hash))
 
 	// Start server
 	log.Printf("Server starting on port %s", cfg.ServerPort)

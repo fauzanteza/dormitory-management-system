@@ -1,164 +1,124 @@
 <!-- Admin Residents Management Page -->
 <div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h4 class="mb-1 animate__animated animate__fadeIn">Manajemen Penghuni</h4>
-            <p class="text-muted small mb-0 animate__animated animate__fadeIn animate__delay-1s">Kelola data penghuni asrama</p>
-        </div>
-        <button class="btn btn-primary animate__animated animate__fadeIn" onclick="showAddResidentModal()">
-            <i class="fas fa-plus me-2"></i>Tambah Penghuni
-        </button>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h4 class="mb-1 animate__animated animate__fadeIn">Manajemen Penghuni</h4>
+      <p
+        class="text-muted small mb-0 animate__animated animate__fadeIn animate__delay-1s"
+      >
+        Kelola data penghuni asrama
+      </p>
     </div>
+    <!-- <button
+      class="btn btn-primary animate__animated animate__fadeIn"
+      onclick="showAddResidentModal()"
+    >
+      <i class="fas fa-plus me-2"></i>Tambah Penghuni
+    </button> -->
+  </div>
 
-    <!-- Filters -->
-    <div class="card mb-4 animate__animated animate__fadeInUp">
-        <div class="card-body">
-            <div class="row g-3">
-                <div class="col-md-3">
-                    <select class="form-select" id="filterStatus" onchange="loadResidents()">
-                        <option value="">Semua Status</option>
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
-                        <option value="graduated">Graduated</option>
-                    </select>
-                </div>
-                <div class="col-md-6">
-                    <input type="text" class="form-control" id="searchName" placeholder="Cari nama..."
-                        onkeyup="loadResidents()">
-                </div>
-                <div class="col-md-3">
-                    <button class="btn btn-outline-primary w-100" onclick="loadResidents()">
-                        <i class="fas fa-search me-2"></i>Cari
-                    </button>
-                </div>
-            </div>
+  <!-- Filters -->
+  <div class="card mb-4 animate__animated animate__fadeInUp">
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-md-3">
+          <select
+            class="form-select"
+            id="filterStatus"
+            onchange="loadResidents()"
+          >
+            <option value="">Semua Status</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+            <option value="graduated">Graduated</option>
+          </select>
         </div>
+        <div class="col-md-6">
+          <input
+            type="text"
+            class="form-control"
+            id="searchName"
+            placeholder="Cari nama..."
+            onkeyup="loadResidents()"
+          />
+        </div>
+        <div class="col-md-3">
+          <button
+            class="btn btn-outline-primary w-100"
+            onclick="loadResidents()"
+          >
+            <i class="fas fa-search me-2"></i>Cari
+          </button>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <!-- Residents Table -->
-    <div class="card animate__animated animate__fadeInUp animate__delay-1s">
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>Nama</th>
-                            <th>Email</th>
-                            <th>Telepon</th>
-                            <th>Kamar</th>
-                            <th>Status</th>
-                            <th>Tgl Masuk</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody id="residentsTableBody">
-                        <tr>
-                            <td colspan="7" class="text-center py-4">
-                                <div class="spinner-border text-primary"></div>
-                                <p class="mt-2 mb-0">Memuat data...</p>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+  <!-- Residents Table -->
+  <div class="card animate__animated animate__fadeInUp animate__delay-1s">
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Nama</th>
+              <th>Email</th>
+              <th>Telepon</th>
+              <th>Kamar</th>
+              <th>Status</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="residentsTableBody">
+            <tr>
+              <td colspan="7" class="text-center py-4">
+                <div class="spinner-border text-primary"></div>
+                <p class="mt-2 mb-0">Memuat data...</p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
-</div>
-
-<!-- Add/Edit Resident Modal -->
-<div class="modal fade" id="residentModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="residentModalTitle">Tambah Penghuni</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <form id="residentForm" onsubmit="saveResident(event)">
-                <div class="modal-body">
-                    <input type="hidden" id="residentId">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label">User/Mahasiswa *</label>
-                            <select class="form-select" id="userId" required>
-                                <option value="">Pilih User</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">NIM</label>
-                            <input type="text" class="form-control" id="studentId">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Kamar</label>
-                            <select class="form-select" id="roomId">
-                                <option value="">Pilih Kamar</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Status *</label>
-                            <select class="form-select" id="status" required>
-                                <option value="active">Active</option>
-                                <option value="inactive">Inactive</option>
-                                <option value="graduated">Graduated</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Tanggal Masuk</label>
-                            <input type="date" class="form-control" id="checkInDate">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Tanggal Keluar</label>
-                            <input type="date" class="form-control" id="checkOutDate">
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save me-2"></i>Simpan
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
+  </div>
 </div>
 
 <script>
-    let residentsData = [];
+  let residentsData = [];
 
-    async function initResidentsPage() {
-        try {
-            showLoading();
-            await loadResidents();
-            await loadUsersAndRooms();
-        } catch (error) {
-            console.error('Error loading residents:', error);
-            alert('Gagal memuat data penghuni: ' + error.message);
-        } finally {
-            hideLoading();
-        }
+  async function initResidentsPage() {
+    try {
+      showLoading();
+      await loadResidents();
+      await loadUsersAndRooms();
+    } catch (error) {
+      console.error('Error loading residents:', error);
+      alert('Gagal memuat data penghuni: ' + error.message);
+    } finally {
+      hideLoading();
     }
+  }
 
-    async function loadResidents() {
-        try {
-            const status = document.getElementById('filterStatus').value;
-            const search = document.getElementById('searchName').value;
+  async function loadResidents() {
+    const statusEl = document.getElementById('filterStatus');
+    const searchEl = document.getElementById('searchName');
 
-            const params = {};
-            if (status) params.status = status;
-            if (search) params.name = search;
+    const status = statusEl ? statusEl.value : '';
+    const search = searchEl ? searchEl.value : '';
 
-            residentsData = await window.adminDashboard.loadResidents(params);
-            displayResidents(residentsData);
-        } catch (error) {
-            throw error;
-        }
-    }
+    const params = {};
+    if (status) params.status = status;
+    if (search) params.name = search;
 
-    function displayResidents(residents) {
-        const tbody = document.getElementById('residentsTableBody');
+    residentsData = await window.adminDashboard.loadResidents(params);
+    displayResidents(residentsData);
+  }
 
-        if (residents.length === 0) {
-            tbody.innerHTML = `
+  function displayResidents(residents) {
+    const tbody = document.getElementById('residentsTableBody');
+
+    if (residents.length === 0) {
+      tbody.innerHTML = `
                 <tr class="animate__animated animate__fadeIn">
                     <td colspan="7" class="text-center py-4 text-muted">
                         <i class="fas fa-users-slash fa-3x mb-3"></i>
@@ -166,131 +126,77 @@
                     </td>
                 </tr>
             `;
-            return;
-        }
+      return;
+    }
 
-        tbody.innerHTML = residents.map((r, index) => `
-        <tr class="animate__animated animate__fadeIn" style="animation-delay: ${index * 0.1}s">
+    tbody.innerHTML = residents
+      .map(
+        (r, index) => `
+        <tr class="animate__animated animate__fadeIn" style="animation-delay: ${
+          index * 0.1
+        }s">
             <td><strong>${r.user?.name || '-'}</strong></td>
             <td>${r.user?.email || '-'}</td>
             <td>${r.user?.phone || '-'}</td>
             <td>${r.room?.room_number || 'Belum ada'}</td>
-            <td><span class="badge ${getStatusBadge(r.status)}">${r.status}</span></td>
-            <td>${r.check_in_date ? formatDate(r.check_in_date) : '-'}</td>
+            <td><span class="badge ${getStatusBadge(r.status)}">${
+          r.status
+        }</span></td>
             <td>
                 <div class="btn-group btn-group-sm" role="group">
-                    <button class="btn btn-info" onclick="viewResident(${r.id})" title="Detail">
+                    <button class="btn btn-info" onclick="viewResident(${
+                      r.id
+                    })" title="Detail">
                         <i class="fas fa-eye"></i>
                     </button>
-                    <button class="btn btn-warning" onclick="editResident(${r.id})" title="Edit">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="btn btn-danger" onclick="deleteResident(${r.id})" title="Hapus">
-                        <i class="fas fa-trash"></i>
-                    </button>
+                   
                 </div>
             </td>
         </tr>
-    `).join('');
+    `
+      )
+      .join('');
+  }
+
+  async function loadUsersAndRooms() {
+    try {
+      const userSelect = document.getElementById('userId');
+      const roomSelect = document.getElementById('roomId');
+
+      if (!userSelect || !roomSelect) return; // ⬅️ FIX infinity load tersembunyi
+
+      const users = await window.adminDashboard.loadUsers();
+      userSelect.innerHTML =
+        '<option value="">Pilih User</option>' +
+        users
+          .filter((u) => u.role === 'student')
+          .map((u) => `<option value="${u.id}">${u.name}</option>`)
+          .join('');
+
+      const rooms = await window.adminDashboard.loadRooms();
+      roomSelect.innerHTML =
+        '<option value="">Pilih Kamar</option>' +
+        rooms
+          .filter((r) => r.status === 'available' || r.status === 'occupied')
+          .map((r) => `<option value="${r.id}">${r.room_number}</option>`)
+          .join('');
+    } catch (error) {
+      console.error('Error loading dropdowns:', error);
     }
+  }
 
-    async function loadUsersAndRooms() {
-        try {
-            // Load users for dropdown
-            const users = await window.adminDashboard.loadUsers();
-            const userSelect = document.getElementById('userId');
-            userSelect.innerHTML = '<option value="">Pilih User</option>' +
-                users.filter(u => u.role === 'student').map(u =>
-                    `<option value="${u.id}">${u.name} (${u.email})</option>`
-                ).join('');
+  function viewResident(id) {
+    const resident = residentsData.find((r) => r.id === id);
+    if (!resident) return;
 
-            // Load rooms for dropdown
-            const rooms = await window.adminDashboard.loadRooms();
-            const roomSelect = document.getElementById('roomId');
-            roomSelect.innerHTML = '<option value="">Pilih Kamar</option>' +
-                rooms.filter(r => r.status === 'available' || r.status === 'occupied').map(r =>
-                    `<option value="${r.id}">Kamar ${r.room_number} (${r.status})</option>`
-                ).join('');
-        } catch (error) {
-            console.error('Error loading dropdowns:', error);
-            alert('Gagal memuat data dropdown: ' + error.message);
-        }
-    }
+    alert(
+      `Detail Penghuni\n\nNama: ${resident.user?.name || '-'}\nEmail: ${
+        resident.user?.email || '-'
+      }\nTelepon: ${resident.user?.phone || '-'}\nKamar: ${
+        resident.room?.room_number || 'Belum ada'
+      }\nStatus: ${resident.status}\nNIM: ${resident.student_id || '-'}`
+    );
+  }
 
-    function showAddResidentModal() {
-        document.getElementById('residentModalTitle').textContent = 'Tambah Penghuni';
-        document.getElementById('residentForm').reset();
-        document.getElementById('residentId').value = '';
-        new bootstrap.Modal(document.getElementById('residentModal')).show();
-    }
-
-    function editResident(id) {
-        const resident = residentsData.find(r => r.id === id);
-        if (!resident) return;
-
-        document.getElementById('residentModalTitle').textContent = 'Edit Penghuni';
-        document.getElementById('residentId').value = resident.id;
-        document.getElementById('userId').value = resident.user_id;
-        document.getElementById('studentId').value = resident.student_id || '';
-        document.getElementById('roomId').value = resident.room_id || '';
-        document.getElementById('status').value = resident.status;
-        document.getElementById('checkInDate').value = resident.check_in_date ? resident.check_in_date.split('T')[0] : '';
-        document.getElementById('checkOutDate').value = resident.check_out_date ? resident.check_out_date.split('T')[0] : '';
-
-        new bootstrap.Modal(document.getElementById('residentModal')).show();
-    }
-
-    async function saveResident(event) {
-        event.preventDefault();
-
-        const id = document.getElementById('residentId').value;
-        const residentData = {
-            user_id: parseInt(document.getElementById('userId').value),
-            student_id: document.getElementById('studentId').value,
-            room_id: document.getElementById('roomId').value ? parseInt(document.getElementById('roomId').value) : null,
-            status: document.getElementById('status').value,
-            check_in_date: document.getElementById('checkInDate').value,
-            check_out_date: document.getElementById('checkOutDate').value
-        };
-
-        try {
-            showLoading();
-            if (id) {
-                await window.adminDashboard.updateResident(id, residentData);
-                alert('Penghuni berhasil diupdate!');
-            } else {
-                await window.adminDashboard.createResident(residentData);
-                alert('Penghuni berhasil ditambahkan!');
-            }
-
-            bootstrap.Modal.getInstance(document.getElementById('residentModal')).hide();
-            await loadResidents();
-        } catch (error) {
-            alert('Error: ' + error.message);
-        } finally {
-            hideLoading();
-        }
-    }
-
-    async function deleteResident(id) {
-        if (!confirm('Apakah Anda yakin ingin menghapus penghuni ini?')) return;
-
-        try {
-            showLoading();
-            await window.adminDashboard.deleteResident(id);
-            alert('Penghuni berhasil dihapus!');
-            await loadResidents();
-        } catch (error) {
-            alert('Error: ' + error.message);
-        } finally {
-            hideLoading();
-        }
-    }
-
-    function viewResident(id) {
-        const resident = residentsData.find(r => r.id === id);
-        if (!resident) return;
-
-        alert(`Detail Penghuni\n\nNama: ${resident.user?.name || '-'}\nEmail: ${resident.user?.email || '-'}\nTelepon: ${resident.user?.phone || '-'}\nKamar: ${resident.room?.room_number || 'Belum ada'}\nStatus: ${resident.status}\nNIM: ${resident.student_id || '-'}`);
-    }
+  document.addEventListener('DOMContentLoaded', initResidentsPage);
 </script>
