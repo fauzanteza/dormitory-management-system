@@ -9,6 +9,9 @@
         Kelola semua kamar asrama
       </p>
     </div>
+    <button class="btn btn-primary" onclick="openAddRoomModal()">
+      <i class="fas fa-plus me-2"></i>Tambah Kamar
+    </button>
   </div>
 
   <!-- Filters -->
@@ -79,8 +82,105 @@
   </div>
 </div>
 
+<div class="modal fade" id="roomModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalTitle">Tambah Kamar Baru</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
+      <form id="roomForm" onsubmit="saveRoom(event)">
+        <div class="modal-body">
+          <input type="hidden" id="roomId" />
+          <div class="mb-3">
+            <label class="form-label">Nomor Kamar</label>
+            <input type="text" id="roomNumber" class="form-control" required />
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Gedung</label>
+              <select id="building" class="form-select" required>
+                <option value="Gedung A">Gedung A</option>
+                <option value="Gedung B">Gedung B</option>
+                <option value="Gedung C">Gedung C</option>
+              </select>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Lantai</label>
+              <input type="number" id="floor" class="form-control" required />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Kapasitas (Orang)</label>
+              <input
+                type="number"
+                id="capacity"
+                class="form-control"
+                value="2"
+                required
+              />
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Harga per Bulan</label>
+              <input
+                type="number"
+                id="monthlyRate"
+                class="form-control"
+                required
+              />
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Deskripsi</label>
+            <textarea id="description" class="form-control" rows="2"></textarea>
+          </div>
+          <div id="statusField" class="mb-3 d-none">
+            <label class="form-label">Status</label>
+            <select id="status" class="form-select">
+              <option value="available">Available</option>
+              <option value="occupied">Occupied</option>
+              <option value="maintenance">Maintenance</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Batal
+          </button>
+          <button type="submit" class="btn btn-primary">Simpan Kamar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 <script>
   let roomsData = [];
+
+  function openAddRoomModal() {
+    const modalEl = document.getElementById('roomModal');
+
+    // Reset form
+    document.getElementById('roomForm').reset();
+    document.getElementById('roomId').value = '';
+    document.getElementById('modalTitle').innerText = 'Tambah Kamar Baru';
+    document.getElementById('statusField').classList.add('d-none');
+
+    // PASTI-KAN: Pindahkan modal ke body agar tidak tertutup index/sidebar
+    document.body.appendChild(modalEl);
+
+    const modal = new bootstrap.Modal(modalEl);
+    modal.show();
+  }
 
   async function initRoomsPage() {
     try {
@@ -146,21 +246,25 @@
             <td><span class="badge ${getStatusBadge(room.status)}">${
           room.status
         }</span></td>
-            <td>
-                <div class="btn-group btn-group-sm " role="group">
-                    <button class="btn btn-info" onclick="viewRoom(${
-                      room.id
-                    })" title="Detail">
-                        <i class="fas fa-eye"></i>
-                    </button>
-     
-                    <button class="btn btn-danger" onclick="deleteRoom(${
-                      room.id
-                    })" title="Hapus">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
-            </td>
+        <td>
+            <div class="btn-group btn-group-sm" role="group">
+                <button class="btn btn-info" onclick="viewRoom(${
+                  room.id
+                })" title="Detail">
+                    <i class="fas fa-eye"></i>
+                </button>
+                <button class="btn btn-warning" onclick="editRoom(${
+                  room.id
+                })" title="Edit">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn btn-danger" onclick="deleteRoom(${
+                  room.id
+                })" title="Hapus">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        </td>
         </tr>
     `
       )
@@ -200,7 +304,7 @@
     }
   }
 
-  async function deleteRoom(id) {
+  /* async function deleteRoom(id) {
     if (!confirm('Apakah Anda yakin ingin menghapus kamar ini?')) return;
 
     try {
@@ -213,7 +317,7 @@
     } finally {
       hideLoading();
     }
-  }
+  } */
 
   function viewRoom(id) {
     const room = roomsData.find((r) => r.id === id);
@@ -226,5 +330,61 @@
         room.monthly_rate
       )}\nStatus: ${room.status}`
     );
+  }
+
+  // Fungsi untuk memicu Mode Edit
+  function editRoom(id) {
+    const room = roomsData.find((r) => r.id === id);
+    if (!room) return;
+
+    const modalEl = document.getElementById('roomModal');
+
+    // Isi form dengan data yang ada
+    document.getElementById('roomId').value = room.id;
+    document.getElementById('roomNumber').value = room.room_number;
+    document.getElementById('building').value = room.building;
+    document.getElementById('floor').value = room.floor;
+    document.getElementById('capacity').value = room.capacity;
+    document.getElementById('monthlyRate').value = room.monthly_rate;
+    document.getElementById('description').value = room.description || '';
+    document.getElementById('status').value = room.status;
+
+    // Tampilkan field status (hanya muncul saat edit)
+    document.getElementById('statusField').classList.remove('d-none');
+    document.getElementById('modalTitle').innerText =
+      'Edit Kamar ' + room.room_number;
+
+    document.body.appendChild(modalEl);
+    const modal = new bootstrap.Modal(modalEl);
+    modal.show();
+  }
+
+  // Fungsi Delete dengan penanganan error isi kamar
+  async function deleteRoom(id) {
+    // Cari data kamar untuk memberikan pesan konfirmasi yang lebih jelas
+    const room = roomsData.find((r) => r.id === id);
+    const roomName = room ? room.room_number : 'ini';
+
+    if (!confirm(`Apakah Anda yakin ingin menghapus kamar ${roomName}?`))
+      return;
+
+    try {
+      showLoading();
+      // Memanggil fungsi delete di adminDashboard
+      const response = await window.adminDashboard.deleteRoom(id);
+
+      alert('Kamar berhasil dihapus!');
+      await loadRooms(); // Refresh tabel
+    } catch (error) {
+      // Jika backend mengirim c.JSON(http.StatusForbidden, gin.H{"error": "..."})
+      // Pesan tersebut akan ditangkap di sini
+      console.error('Delete error:', error);
+      alert(
+        'Gagal menghapus kamar: ' +
+          (error.message || 'Terjadi kesalahan sistem')
+      );
+    } finally {
+      hideLoading();
+    }
   }
 </script>

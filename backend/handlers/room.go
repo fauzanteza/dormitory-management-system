@@ -56,29 +56,34 @@ func (h *RoomHandler) GetRoom(c *gin.Context) {
 	c.JSON(http.StatusOK, room)
 }
 
+// CreateRoom - Menambahkan kamar baru
 func (h *RoomHandler) CreateRoom(c *gin.Context) {
-	var roomReq models.RoomRequest
-	if err := c.ShouldBindJSON(&roomReq); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
+    var roomReq models.RoomRequest
+    if err := c.ShouldBindJSON(&roomReq); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "Data tidak valid: " + err.Error()})
+        return
+    }
 
-	room := models.Room{
-		RoomNumber:  roomReq.RoomNumber,
-		Building:    roomReq.Building,
-		Floor:       roomReq.Floor,
-		Capacity:    roomReq.Capacity,
-		MonthlyRate: roomReq.MonthlyRate,
-		Description: roomReq.Description,
-		Status:      "available",
-	}
+    // Inisialisasi model Room dari request
+    room := models.Room{
+        RoomNumber:      roomReq.RoomNumber,
+        Building:        roomReq.Building,
+        Floor:           roomReq.Floor,
+        Capacity:        roomReq.Capacity,
+        CurrentOccupancy: 0, // Default kamar baru adalah kosong
+        MonthlyRate:     roomReq.MonthlyRate,
+        Description:     roomReq.Description,
+        Status:          "available", // Default status
+    }
 
-	if err := h.DB.Create(&room).Error; err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
+    // Simpan ke database
+    if err := h.DB.Create(&room).Error; err != nil {
+        // Cek jika nomor kamar duplikat (karena unique constraint di schema)
+        c.JSON(http.StatusConflict, gin.H{"error": "Gagal menambahkan kamar. Nomor kamar mungkin sudah ada."})
+        return
+    }
 
-	c.JSON(http.StatusCreated, room)
+    c.JSON(http.StatusCreated, room)
 }
 
 func (h *RoomHandler) UpdateRoom(c *gin.Context) {
@@ -109,18 +114,35 @@ func (h *RoomHandler) UpdateRoom(c *gin.Context) {
 }
 
 func (h *RoomHandler) DeleteRoom(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid room ID"})
-		return
-	}
+    id, err := strconv.Atoi(c.Param("id"))
+    if err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "ID Kamar tidak valid"})
+        return
+    }
 
-	if err := h.DB.Delete(&models.Room{}, id).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
+    var room models.Room
+    // 1. Cari kamar terlebih dahulu
+    if err := h.DB.First(&room, id).Error; err != nil {
+        c.JSON(http.StatusNotFound, gin.H{"error": "Kamar tidak ditemukan"})
+        return
+    }
 
-	c.JSON(http.StatusOK, gin.H{"message": "Room deleted successfully"})
+    // 2. Validasi: Jika current_occupancy > 0, jangan izinkan hapus
+    if room.CurrentOccupancy > 0 {
+        c.JSON(http.StatusForbidden, gin.H{
+            "error": "Kamar tidak dapat dihapus karena masih memiliki penghuni (" + 
+                     strconv.Itoa(room.CurrentOccupancy) + " orang).",
+        })
+        return
+    }
+
+    // 3. Jalankan penghapusan
+    if err := h.DB.Delete(&room).Error; err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal menghapus kamar: " + err.Error()})
+        return
+    }
+
+    c.JSON(http.StatusOK, gin.H{"message": "Kamar berhasil dihapus"})
 }
 
 func (h *RoomHandler) GetAvailableRooms(c *gin.Context) {
